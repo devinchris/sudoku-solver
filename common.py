@@ -61,7 +61,7 @@ def is_valid(grid, allow_empty=True):
     return True
  
  
-def solves(puzzle_grid, solution):
+def is_solved(puzzle_grid, solution):
     """Solution is complete, valid, and keeps every given clue."""
     if solution is None:
         return False
