@@ -9,7 +9,7 @@ description = "Sudoku-Solver (Backtracking und SAT) mit Auswertung und UI"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "sudoku",   # gen bib die nils gefunden hat
+    "py-sudoku",   # gen bib die nils gefunden hat
 ]
 
 [project.optional-dependencies]
