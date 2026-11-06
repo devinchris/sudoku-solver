@@ -66,8 +66,8 @@ def is_valid_number(grid: list[list[int]], r: int, c: int, n: int) -> bool:
 
     Args:
         grid (list[list[int]]): The sudoku grid without n already inputted
-        r (int): n_row (index+1)
-        c (int): n_column (index+1)
+        r (int): n_row (index)
+        c (int): n_column (index)
         n (int): input number
 
     Returns:
