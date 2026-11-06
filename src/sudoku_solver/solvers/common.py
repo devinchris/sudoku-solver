@@ -61,6 +61,23 @@ def is_valid(grid, allow_empty=True):
     return True
  
  
+def is_valid_number(grid: list[list[int]], r: int, c: int, n: int) -> bool:
+    """Check whether a single input number is valid
+
+    Args:
+        grid (list[list[int]]): The sudoku grid without n already inputted
+        r (int): n_row (index+1)
+        c (int): n_column (index+1)
+        n (int): input number
+
+    Returns:
+        bool: whether n is valid in this sudoku or not
+    """
+    not_in_row = n not in grid[r]
+    not_in_column = n not in [grid[i][c] for i in range(9)]
+    not_in_box = n not in [grid[i][j] for i in range(r//3*3, r//3*3+3) for j in range(c//3*3, c//3*3+3)]
+    return not_in_row and not_in_column and not_in_box
+ 
 def is_solved(puzzle_grid, solution):
     """Solution is complete, valid, and keeps every given clue."""
     if solution is None:
