@@ -14,4 +14,7 @@ if st.button("Neues Sudoku erzeugen"):
     st.session_state["grid"] = generate_sudoku(difficulty, None, 3)
 
 print_grid(st.session_state["grid"]) #TODO: nur zum Debuggen, später raus
-st.html(render_grid(st.session_state["grid"]))
+st.html(render_grid(
+    st.session_state["grid"],
+    original=st.session_state["grid"],
+))
