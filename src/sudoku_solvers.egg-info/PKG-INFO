@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: sudoku-solvers
+Version: 0.6.7
+Summary: Sudoku-Solver (Backtracking und SAT) mit Auswertung und UI
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: py-sudoku
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+
+# sudoku-solver
+A university project for the TheoInf course

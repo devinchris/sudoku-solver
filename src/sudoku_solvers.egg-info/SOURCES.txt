@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+src/sudoku_solver/__init__.py
+src/sudoku_solver/core/__init__.py
+src/sudoku_solver/core/grid.py
+src/sudoku_solver/core/stack.py
+src/sudoku_solver/core/steps.py
+src/sudoku_solver/solvers/__init__.py
+src/sudoku_solver/solvers/backtracking.py
+src/sudoku_solver/solvers/common.py
+src/sudoku_solver/solvers/sat.py
+src/sudoku_solvers.egg-info/PKG-INFO
+src/sudoku_solvers.egg-info/SOURCES.txt
+src/sudoku_solvers.egg-info/dependency_links.txt
+src/sudoku_solvers.egg-info/requires.txt
+src/sudoku_solvers.egg-info/top_level.txt
+tests/test_backtracking.py
