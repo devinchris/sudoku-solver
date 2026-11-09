@@ -1,4 +1,4 @@
-from . import backtracking, sat
+from .solvers import backtracking, sat
 
 __all__ = ["backtracking", "sat"]
 # so it can be imported from everywhere

@@ -1,8 +1,8 @@
 from sudoku import Sudoku
-from common import is_solved, is_valid, is_valid_number
+from .common import is_solved, is_valid, is_valid_number
 from collections.abc import Iterator
-from core.steps import Step, Action
-from core.stack import Stack
+from ..core.steps import Step, Action
+from ..core.stack import Stack
 import copy
 
 
@@ -69,7 +69,8 @@ def stack_solve(grid: list[list[int]]) -> list[list[int]]:
     # if stack is empty, no more possibilities
     return False
         
-def solve_steps(grid: list[list[int]]) -> Iterator:
+def solve_steps(grid: list[list[int]]) -> Iterator[Step]:
+    # deepcopy is expensive TODO: mit raphael abklären ob auch [row[:] for row in grid] geht (kein geupdatetes grid dann)
     _grid = copy.deepcopy(grid)
     
     if not is_valid(_grid):
