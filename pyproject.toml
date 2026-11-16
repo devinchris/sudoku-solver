@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "py-sudoku",   # gen bib die nils gefunden hat
+    "streamlit",
 ]
 
 [project.optional-dependencies]
