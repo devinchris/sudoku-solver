@@ -1,4 +1,15 @@
 def render_grid(grid, original=None, highlight=None, highlight_color="#b6f2b6"):
+    """Zeichnet das Sudoku als HTML-Tabelle.
+
+    highlight: eine Zelle (zeile, spalte) oder eine Liste von Zellen, die farbig hinterlegt werden.
+    """
+    if not highlight:
+        markiert = set()
+    elif isinstance(highlight[0], int):
+        markiert = {tuple(highlight)}
+    else:
+        markiert = set(highlight)
+
     zeilen_html = []
 
     for r, zeile in enumerate(grid):
@@ -26,8 +37,8 @@ def render_grid(grid, original=None, highlight=None, highlight_color="#b6f2b6"):
                 else:
                     style += "color: #1a5fd0;"
 
-            # Aktuelle Zelle hervorheben
-            if highlight == (r, c):
+            # Aktuelle Zelle(n) hervorheben
+            if (r, c) in markiert:
                 style += f"background-color: {highlight_color};"
 
             zellen_html.append(f'<td style="{style}">{text}</td>')
