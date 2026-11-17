@@ -15,7 +15,7 @@ pip install -e .
 
 ## Starting the web interface
 
-The user interface is written in German for presentation purposes
+The user interface is written in German for presentation purposes.
 
 ```bash
 streamlit run src/sudoku_solver/ui/Start.py
@@ -26,9 +26,9 @@ The app opens in the browser and contains three pages:
 
 - Start: generate a random Sudoku, solve it with the backtracking or/and SAT (DPLL or CDCL) algorithm and play the solution path. The playback speed is adjustable, and you can also step forward or backward one step at a time.
 
-- Schwere Sudokus (hard Sudokus): built-in pre-picked hard puzzles with one unique solution.
+- Schwere Sudokus (hard Sudokus): built-in pre-picked hard puzzles with a unique solution.
 
-- Auswertung (evaluation): solve many random puzzles automatically and compare the runtime and dead ends of the solvers.
+- Auswertung (evaluation): solve many random puzzles automatically and compare the runtime as well as dead ends of the solvers.
 
 Colors in the solution path:
 
