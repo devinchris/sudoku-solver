@@ -1,5 +1,5 @@
 # sudoku-solver
-A university project for the Theoretical Computer Science course
+A university project for the Theoretical Computer Science course.
 
 ## Installation
 
