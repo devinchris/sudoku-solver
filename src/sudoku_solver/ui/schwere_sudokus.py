@@ -21,4 +21,19 @@ SCHWERE_SUDOKUS = {
         "beschreibung": "Aus Peter Norvigs Aufsatz „Solving Every Sudoku Puzzle“, dort als besonders "
                         "schwer für einfache Suchverfahren genannt. 17 Vorgaben.",
     },
+    "Ungünstig für SAT (viele Konflikte)": {
+        "sudoku": "004600000008300025090020007000036008400000030000800904900003100050080000007900000",
+        "beschreibung": "Mit einem eigenen Suchprogramm aus 588 zufällig erzeugten, eindeutig lösbaren Sudokus "
+                        "ausgewählt: das Rätsel, bei dem DPLL die meisten Konflikte hatte (rund 890, typisch "
+                        "sind etwa 12). Backtracking ist hier etwa gleich schnell wie die SAT-Solver. 24 Vorgaben.",
+    },
+    "Leicht für Backtracking, schwer für SAT": {
+        "sudoku": "030000060000400710070050080400100090600705000002000008000010009005002600069000040",
+        "beschreibung": "Aus derselben Suche: Backtracking braucht nur rund 1.600 Schritte, DPLL hat dagegen "
+                        "rund 250 Konflikte, etwa 20-mal so viele wie üblich. "
+    },
+    "Unlösbares Sudoku": {
+    "sudoku": "000000009000000000000000000000000000000000000000000000000000000000000000123456780",
+    "beschreibung": "Unlösbares Sudoku, da ein logischer Widerspruch vorliegt"
+    }
 }

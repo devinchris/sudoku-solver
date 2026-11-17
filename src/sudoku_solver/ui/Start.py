@@ -7,7 +7,7 @@ st.set_page_config(page_title="Sudoku-Solver", layout="wide")
 st.title("Sudoku, SAT und Lösbarkeit")
 st.header("Sudoku lösen mit Backtracking und SAT-Solver")
 
-difficulty = st.slider("Difficulty", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
+difficulty = st.slider("Ausgefüllte Felder in Prozent", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
 
 if "grid" not in st.session_state:
     st.session_state["grid"] = generate_sudoku(difficulty, None, 3)

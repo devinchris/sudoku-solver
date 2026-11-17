@@ -8,6 +8,7 @@ import time
 from dataclasses import dataclass
 
 from sudoku_solver.core.steps import Step, Action
+from sudoku_solver.solvers.common import is_valid
 
 from sudoku_solver.core.sat import encoding, dpll_fast, cdcl
 
@@ -105,4 +106,6 @@ def sat_lauf(grid, verfahren, max_schritte):
         "abgebrochen": abgebrochen,
         "kennzahlen": kennzahlen,
         "formel": {"Variablen": anzahl_variablen, "Klauseln": len(clauses)},
+        "gueltig": is_valid(grid),
+        "loesbar": model is not None,   # SAT beantwortet die Frage immer vollständig
     }
