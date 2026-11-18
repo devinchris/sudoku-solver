@@ -1,0 +1,25 @@
+\section{Theoretische Grundlagen}\label{sec:grundlagen}
+
+\subsection{Sudoku als Entscheidungsproblem}\label{sec:csp}
+Ein klassisches Sudoku besteht aus einem Gitter mit $9 \times 9$ Zellen, das in neun Zeilen, neun Spalten und neun Blöcke der Größe $3 \times 3$ unterteilt ist. Einige Zellen sind bereits zu Beginn mit Ziffern belegt und werden als Vorgaben bezeichnet. Das Sudoku gilt als gelöst, wenn jede Zelle eine Ziffer von 1 bis 9 enthält und jede Ziffer pro Zeile, Spalte und Block genau einmal vorkommt.
+
+Aus Sicht der theoretischen Informatik lässt sich diese Aufgabe auf zwei Arten formulieren. Als Suchproblem wird eine konkrete Lösung verlangt. 
+Als Entscheidungsproblem wird lediglich gefragt, ob zu einem vorgegebenen, teilweise gefüllten Sudoku eine gültige Lösung existiert, die Antwort lautet also entweder Ja oder Nein. Die Komplexitätstheorie betrachtet in der Regel Entscheidungsprobleme, weshalb diese Formulierung die Grundlage für Abschnitt~\ref{sec:komplexitaet} bildet. Beide Sichtweisen hängen eng zusammen, da die in dieser Arbeit betrachteten Verfahren die Frage nach der Lösbarkeit beantworten, indem sie versuchen eine Lösung zu konstruieren.
+
+Formal werden Entscheidungsprobleme als Sprachen beschrieben. Eine Sprache ist dabei eine Menge von Wörtern, die aus den Zeichen eines festgelegten Alphabets gebildet werden \vgl{sipser2013}. Ein Alphabet bezeichnet eine endliche Menge von benötigten Zeichen, bei einem Sudoku sind die Zeichen die Ziffern von 0 bis 9. Ein Sudoku lässt sich als Wort der Länge 81 darstellen, indem die Zellen zeilenweise aneinandergereiht werden und die Ziffer 0 eine leere Zelle kennzeichnet. Die Menge aller lösbaren Sudokus bildet die Sprache.
+
+Die Frage, ob ein gegebenes Sudoku lösbar ist, entspricht damit dem Wortproblem, also der Frage, ob das Wort zu der Sprache gehört.
+
+Ein übliches $9 \times 9$ Sudoku kann genau eine Lösung haben, wenn 17 oder mehr Vorgaben gegeben sind \vgl{mcguire2014}. Sudokus mit wenigen oder ungünstig verteilten Vorgaben können dagegen mehrere Lösungen zulassen, widersprüchliche Vorgaben keine einzige. Für das Entscheidungsproblem ist nur relevant, ob mindestens eine zulässige Lösung existiert.
+
+\subsection{Komplexität, Lösbarkeit und Reduktionen}\label{sec:komplexitaet}
+
+
+
+\subsection{Backtracking und Heuristiken}\label{sec:backtracking}
+
+
+\subsection{Aussagenlogik und das SAT-Problem}\label{sec:sat}
+
+
+\subsection{Der DPLL-Algorithmus}\label{sec:dpll}

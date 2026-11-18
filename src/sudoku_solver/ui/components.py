@@ -10,7 +10,7 @@ from sudoku_solver.core.steps import Action
 from sudoku_solver.ui.vergleich import zeige_vergleich
 
 # Obergrenze, damit sehr schwere Rätsel nicht den Speicher sprengen
-MAX_SCHRITTE = 250_000
+MAX_SCHRITTE = 550_000
 
 try:
     from sudoku_solver.ui.sat_adapter import sat_lauf

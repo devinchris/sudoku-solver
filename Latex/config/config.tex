@@ -1,0 +1,63 @@
+\def\myType{2}
+%% 0=Projektarbeit   %%
+%% 1=Bachelorarbeit  %%
+%% 2=sonstige Arbeiten   %%
+
+% Titel laut Aufgabenstellung
+\def\myTopic{Sudoku, SAT und Lösbarkeit}
+\def\mySubTopic{Entwicklung eines Problemlösers}
+
+\def\myStudyProgram{Data Science und Künstliche Intelligenz} % Studiengang
+\def\myNeedForFieldOfStudy{0} % Gibt an ob eine Studienrichtung benötigt wird
+%% 0=keine Studienrichtung %%
+%% 1=Studienrichtung %%
+\def\myFieldOfStudy{}         % Studiengangsrichtung
+
+% Auf dem Titelblatt untereinander, in den PDF-Metadaten durch Komma getrennt
+\def\myAutor{\texorpdfstring{\begin{tabular}[t]{@{}l@{}}Raphael Henninger\\Nils Mauritz\\Devin Rohrer\\Diana Gast\end{tabular}}{Raphael Henninger, Nils Mauritz, Devin Rohrer, Diana Gast}}
+\def\myCourse{}               % TODO: Kurs
+\def\myProf{Prof. Dr. Aykan Inan}
+\def\myCompany{}
+\def\myCompanion{}
+\def\myEndDate{}              % TODO: Abgabefrist
+
+
+%% Projektarbeit %%
+\def\myProjNumber{1}          % [1|2]
+
+%% Bachelorarbeit %%
+\def\myTypeOfBachelor{}       % [Arts|Science]
+
+%% sonstige Arbeiten %%
+\def\myTypeOfWork{Projektdokumentation} % TODO: Bezeichnung laut Aufgabenstellung prüfen
+\def\myModule{Theoretische Informatik}  % TODO: genauen Modulnamen prüfen
+\def\myNames{1}               % Gibt an ob mehrere Personen an der Arbeit mitwirken
+%% 0=Einzahl %%
+%% 1=Mehrzahl %%
+
+%% Konfiguration der Verzeichnisse %%
+% für alle folgenden Konfigurationen gilt: 0=kein Verzeichnis | 1=Verzeichnis %
+
+\def\myAbrevationDirectory{1}   % Abkürzungsverzeichnis
+\def\myIllustrationDirectory{1} % Abbildungsverzeichnis
+\def\myTableDirectory{1}        % Tabellenverzeichnis
+\def\myListingDirectory{1}      % Listingverzeichnis
+\def\myFormularDirectory{0}     % Formelverzeichnis
+\def\mySymbolDirectory{0}       % Symbolverzeichnis
+\def\myKiDirectory{1}           % Verzeichnis der verwendeten KI-Hilfsmittel
+
+%% Konfiguration Selbständigkeitserklärung und Sperrvermerk %%
+\def\myDecOfIndependence{1}
+%% 0=keine Selbständigkeitserklärung   %%
+%% 1=Selbständigkeitserklärung    %%
+
+\def\myBlockingNote{0}
+%% 0=kein Sperrvermerk   %%
+%% 1=Sperrvermerk    %%
+
+% Ort und Datum der Unterschrift auf Selbständigkeitserklärung und Sperrvermerk
+\def\myDate{}                 % TODO
+\def\myPlace{Ravensburg}
+
+% Sprachauswahl: 'ngerman' oder 'english'
+\newcommand{\myLanguage}{ngerman}

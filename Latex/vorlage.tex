@@ -1,0 +1,255 @@
+\documentclass[a4paper,12pt]{article}
+
+% ------------------------------------------------------------------------------
+% 1. KONFIGURATION & SPRACH-LOGIK (Muss zuerst geladen werden)
+% ------------------------------------------------------------------------------
+\input{config/config}           % Lädt \myLanguage und andere Einstellungen
+\usepackage{ifthen}             % Ermöglicht If-Abfragen für die Sprache
+
+% Sprache laden (basierend auf \myLanguage aus config.tex)
+% WICHTIG: inputenc sollte davor stehen
+\usepackage[utf8]{inputenc}
+\usepackage[\myLanguage]{babel} 
+
+% Sprach-Definitionen laden (Deutsch oder Englisch)
+\ifthenelse{\equal{\myLanguage}{ngerman}}
+    {\input{config/lang_de}} % Lädt deutsche Texte & Anpassungen
+    {\input{config/lang_en}} % Lädt englische Texte & Anpassungen
+
+% ------------------------------------------------------------------------------
+% 2. LAYOUT & STANDARD-PAKETE
+% ------------------------------------------------------------------------------
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2cm,includehead]{geometry}
+\usepackage[hyperfootnotes=false, pdfborder={0 0 1}]{hyperref} 
+\usepackage[nottoc]{tocbibind}
+\usepackage{makeidx}
+\usepackage[intoc]{nomencl}
+\usepackage{fancyhdr}
+\usepackage{pdfpages}
+\usepackage{amsmath}
+\usepackage[labelfont=bf, aboveskip=1mm, font={small, singlespacing}]{caption}
+\usepackage{setspace}
+\usepackage[bottom,multiple,hang,marginal]{footmisc}
+\usepackage{wrapfig}
+\usepackage{nomencl} 
+\usepackage{chngcntr}
+\usepackage{import}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{color}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{zref}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{xspace}
+\usepackage{multicol}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\RequirePackage{multirow}
+\RequirePackage{mwe}
+\RequirePackage{etoolbox}
+\usepackage{float}
+\usepackage{adjustbox}
+\usepackage{comment}
+\usepackage{subcaption}
+\usepackage{hanging}
+\usepackage{acronym}
+\usepackage{csquotes}
+
+\pdfminorversion=6
+
+%%%%%%%%%%%%%%%%%%%%%%%% Eigene Farbwerte definieren %%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{boxgray}{gray}{0.9}     
+\definecolor{commentgray}{gray}{0.5} 
+\definecolor{darkgreen}{rgb}{0,.5,0} 
+
+%%%%%%%%%%%%%%%%%%%%%%%% Eigene Kommandos definieren %%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\gqq}[1]{\glqq #1\grqq}
+
+\providecommand*{\footref}[1]{
+	\begingroup
+		\unrestored@protected@xdef\@thefnmark{\ref{#1}}
+	\endgroup
+\@footnotemark}
+
+\newcommand{\mypageref}[1]{\ref{#1} \nameref{#1} auf Seite \pageref{#1}}
+
+\newcommand{\myboxquote}[1]{
+	\begin{quotation}
+		\colorbox{boxgray}{\parbox{0.78\textwidth}{#1}}
+	\end{quotation}
+	\vspace*{1mm}
+}
+
+% Definition von \vgl{#1}{#2} (APA-konform)
+\newcommand{\vgl}[2][]{\parencite[vgl.][#1]{#2}}
+
+
+\makeatletter
+\zref@newprop*{appsec}{}
+\zref@addprop{main}{appsec}
+
+\def\applabel#1#2{%
+	\zref@setcurrent{appsec}{#2}%
+	\zref@wrapper@immediate{\zref@label{#1}}%
+}
+
+\def\appref#1{%
+	\hyperref[#1]{\zref@extract{#1}{appsec}}%
+}
+\makeatother
+
+% Definition von \appsection: Nutzt jetzt \langAnhang Variable
+\newcommand{\theappsection}[1]{\langAnhang \Alph{section}:~\protect #1}
+\newcommand{\appsection}[2]{
+	\addtocounter{section}{1}
+	\phantomsection
+	\addcontentsline{toc}{section}{\theappsection{#1}}
+	\markboth{\theappsection{#1}}{}
+
+	\section*{\theappsection{#1}}
+	\applabel{#2}{\langAnhang \Alph{section}}
+	\label{#2}
+}
+
+% Nummerierung der Formeln
+\renewcommand{\theequation}{\arabic{equation}}
+
+%%%%%%%%%%%%% Index, Abkürzungsverzeichnis %%%%%%%%%%%%
+\makeindex
+\makenomenclature
+
+% Zitation (APA 7 mit DHBW Sonderregel maxcitenames=3)
+\usepackage[style=apa, backend=biber, language=ngerman, maxcitenames=3, mincitenames=1]{biblatex}
+\addbibresource{literatur.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PDF-Optionen %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypersetup{
+	bookmarksopen=false,
+	bookmarksnumbered=true,
+	bookmarksopenlevel=0,
+	pdftitle=\myTopic,
+	pdfsubject=\myTopic,
+	pdfauthor=\myAutor,
+	pdfborder={0 0 1}, 
+	pdfstartview=Fit,
+	pdfpagelayout=SinglePage
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Kopf- und Fußzeile %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\fancyhf{} 
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt} 
+\renewcommand{\footrulewidth}{0pt} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Layout und Beschriftungen %%%%%%%%%%%%%%%%%%%%%%%%%
+\onehalfspacing
+\setlist{noitemsep}
+
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+
+% Dynamische Anpassung der Bild/Tabellen-Unterschriften basierend auf der Sprache
+\addto\captionsngerman{
+  \renewcommand{\figurename}{\langFigureName}
+  \renewcommand{\tablename}{\langTableName}
+}
+\addto\captionsenglish{
+  \renewcommand{\figurename}{\langFigureName}
+  \renewcommand{\tablename}{\langTableName}
+}
+
+\numberwithin{table}{section}
+\numberwithin{figure}{section}
+\renewcommand{\thetable}{\arabic{section}.\arabic{table}}
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+\renewcommand{\thefootnote}{\arabic{footnote}}
+\renewcommand{\multfootsep}{, }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Listingstyle %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstset{
+	basicstyle=\ttfamily\scriptsize,
+	commentstyle=\color{commentgray}\textit,
+	showstringspaces=false,
+	stringstyle=\color{darkgreen},
+	keywordstyle=\color{blue},
+	numbers=left,
+	numberstyle=\tiny,
+	stepnumber=1,
+	numbersep=15pt,
+	tabsize=2,
+	fontadjust=true,
+	frame=single,
+	backgroundcolor=\color{boxgray},
+	captionpos=b,
+	linewidth=0.94\linewidth,
+	xleftmargin=0.1\linewidth,
+	breaklines=true,
+	aboveskip=16pt
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                         DOKUMENT BEGINN                                 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+	\pagenumbering{Roman}
+	
+	% Titelblatt (Dateien bleiben gleich, Variablen werden innen genutzt)
+	\ifcase\myType
+            \include{pages/10_titel_projekt}
+        \or
+            \include{pages/10_titel_bachelor}
+        \or
+            \include{pages/10_titel_projekt_doku}
+        \else
+        \fi
+
+    \ifcase\myBlockingNote
+        \or
+            \include{pages/11_sperrvermerk}
+        \else
+    \fi
+
+	\pagestyle{fancy}
+    \setcounter{page}{1} % Reset für Inhaltsverzeichnis (Beginn bei I)
+    
+    % Header-Definition VOR die Metaseiten schieben
+	\fancyhead[L]{\nouppercase{\leftmark}} 
+	\input{config/metaseiten}
+
+	% Kapitel
+	\pagenumbering{arabic}
+	\input{config/gliederung}
+
+	% Anhang-Nummerierung
+	\renewcommand{\thetable}{\Alph{section}.\arabic{table}}
+	\renewcommand{\thefigure}{\Alph{section}.\arabic{figure}}
+	\renewcommand{\thelstlisting}{\Alph{section}.\arabic{lstlisting}}
+
+	% Abschluss: Reihenfolge gem. Richtlinie V 2.0 (Anhang VOR Literatur)
+
+    \begin{appendix}
+		\include{appendix/index}
+	\end{appendix}
+    
+	\include{pages/18_literaturverzeichnis}
+
+    \ifcase\myKiDirectory
+        \or
+            \include{pages/21_kiverzeichnis}
+        \else
+    \fi
+
+
+    \ifcase\myDecOfIndependence
+        \or
+            \include{pages/20_erklaerung}
+            \thispagestyle{empty}
+        \else
+    \fi
+ 
+\end{document}

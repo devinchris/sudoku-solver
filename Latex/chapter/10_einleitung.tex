@@ -1,0 +1,18 @@
+\section{Einleitung}\label{sec:einleitung}
+Sudoku ist weltweit eines der bekanntesten Logikrätsel und für viele ein einfacher Zeitvertreib, stellt aber aus der Perspektive der theoretischen Informatik ein schwieriges Entscheidungsproblem dar. Bei der Lösung muss aus mehreren möglichen Belegungen eine gültige Lösung gefunden werden. Dadurch eignet sich Sudoku um auf zentrale Konzepte wie Entscheidungsprobleme, Lösbarkeit und Reduktionen einzugehen. 
+
+\subsection{Motivation und Problemstellung}\label{sec:motivation}
+
+Für die algorithmische Lösung von Sudokus gibt es verschiedene Herangehensweisen. Naheliegend hierbei ist das Backtracking, bei dem Felder schrittweise belegt und bei Widerspruch wieder zurückgenommen werden. Ein weiterer Ansatz ergibt sich durch das Übersetzen des Rätsels in eine aussagenlogische Formel, um diese mithilfe eines SAT-Solvers zu lösen. Diese Übersetzung ist ein Beispiel für Reduktion, bei der ein Problem in ein anderes, besser untersuchtes Problem zurückgeführt wird, um dort bereits entdeckte Lösungsverfahren nutzen zu können. In beiden Ansätzen lässt sich das Lösen von Sudokus als Entscheidungsproblem untersuchen, da geprüft wird, ob ein gegebenes Sudoku lösbar ist.
+Daraus leitet sich die Frage ab, inwiefern sich die beiden Lösungsansätze unterscheiden, sowohl in Hinsicht auf ihr Vorgehen als auch in Bezug auf den notwendigen Rechenaufwand, insbesondere beim Lösen schwerer Sudokus.
+
+\subsection{Zielsetzung}\label{sec:zielsetzung}
+
+Ziel dieser Arbeit ist es, die beiden Lösungsansätze anhand ihrer Lösungswege, ihrer Laufzeit und der Anzahl benötigter Schritte zu vergleichen, um die Leitfrage aus Abschnitt~\ref{sec:motivation} umfangreich zu beantworten. Dazu wird das Lösen von Sudokus zunächst formal als Entscheidungsproblem beschrieben. Anschließend werden die beiden Verfahren in Python implementiert und ihre Lösungswege Schritt für Schritt in einer interaktiven Visualisierung sichtbar gemacht. Zum Schluss werden die beiden Verfahren an leichten und schweren Sudokus verglichen.
+
+
+\subsection{Aufbau der Arbeit}\label{sec:aufbau}
+
+Der Ablauf dieser Arbeit beginnt mit dem Kapitel theoretische Grundlagen, in dem auf Sudokus als Entscheidungsproblem, Komplexität und Reduktionen, Backtracking und SAT eingegangen wird, um das Fundament für die darauffolgende Arbeit zu schaffen. Daraufhin folgt das Kapitel Umsetzung in dem zunächst der Aufbau des Projekts, die beiden Lösungsverfahren, die Reduktion auf SAT und zum Schluss die Visualisierung aufgegriffen werden. 
+Das Kapitel Evaluation geht auf den Versuchsaufbau und die Ergebnisse der Messungen beider Verfahren ein und führt zum Schluss mit einer Diskussion in das Fazit über. Im Fazit werden die zentralen Ergebnisse dieser Arbeit zusammengefasst, die Leitfrage beantwortet und abschließend ein Ausblick gegeben.
+

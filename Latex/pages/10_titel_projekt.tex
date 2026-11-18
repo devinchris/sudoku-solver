@@ -1,0 +1,40 @@
+\begin{titlepage}
+	\begin{center}
+		\vspace*{1cm}
+		\LARGE\bf\myTopic\\
+		\Large\rm\mySubTopic\\
+		\vspace*{2cm}
+		\bf \myProjNumber.~\langProjektarbeit\\
+		\vspace*{0.5cm}\singlespacing
+		\normalsize\rm
+		\ifcase\myNeedForFieldOfStudy
+            \langFaculty\\
+            \langStudyProgram \myStudyProgram \\
+        \or 
+            \langFaculty\\
+            \langStudyProgram \myStudyProgram \\
+            \langFieldOfStudy \myFieldOfStudy\\
+        \else
+        \fi
+		\vspace*{0.5cm}\singlespacing
+		\langAt\\
+		DHBW Ravensburg
+		\vfill
+	\end{center}
+	\begin{tabular}{lll}
+		\langAutor: &\myAutor\\
+            \langKurs: &\myCourse\\
+            \langBetreuer: &\myProf\\
+		\langFirma: &\myCompany\\
+		\langBegleiter: &\myCompanion \\
+		\langAbgabefrist: &\myEndDate
+	\end{tabular}
+	\newline
+	\vspace*{1cm}
+	\newline
+	\begin{tabularx}{\textwidth}{l@{\extracolsep\fill}r}
+	  % Unterschrift des verantwortlichen Ausbilders&\\
+	 % (oder des Personalverantwortlichen)&\rule{6cm}{0.3mm}\\
+	\end{tabularx}
+\end{titlepage}
+\newpage

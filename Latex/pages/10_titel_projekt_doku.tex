@@ -1,0 +1,38 @@
+\begin{titlepage}
+	\begin{center}
+		\vspace*{1cm}
+		\LARGE\bf\myTopic\\
+		\Large\rm\mySubTopic\\
+		\vspace*{2cm}
+		\bf \myTypeOfWork \\
+		\vspace*{0.5cm}\singlespacing
+		\normalsize\rm
+		\ifcase\myNeedForFieldOfStudy
+            \langFaculty\\
+            \langStudyProgram \myStudyProgram \\
+        \or 
+            \langFaculty\\
+            \langStudyProgram \myStudyProgram \\
+            \langFieldOfStudy \myFieldOfStudy\\
+        \else
+        \fi
+		\vspace*{0.5cm}\singlespacing
+		\langAt\\
+		DHBW Ravensburg
+		\vfill
+	\end{center}
+	\begin{tabular}{ll}
+		\ifcase\myNames
+            \langAutor:
+        \or 
+            \langAutoren:
+        \else
+        \fi
+        &\myAutor\\
+        \langModul: &\myModule\\
+		\langDozent:&\myProf\\
+		\langAbgabefrist:&\myEndDate
+	\end{tabular}
+	
+\end{titlepage}
+\newpage

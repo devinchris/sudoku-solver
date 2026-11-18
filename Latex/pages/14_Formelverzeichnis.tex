@@ -1,0 +1,15 @@
+\newpage
+
+\section*{\langFormelverzeichnis}
+
+\markboth{\langFormelverzeichnis}{\langFormelverzeichnis} 
+
+\addcontentsline{toc}{section}{\langFormelverzeichnis}
+
+% Prefix für die Gleichung (z.B. FV. oder LF.)
+\renewcommand{\theequation}{\langFormelPrefix\arabic{equation}} 
+\counterwithin{equation}{section}
+
+\newcommand{\dotfillref}[2]{#1 \dotfill #2}
+
+\input{chapter/formelverzeichnis}
