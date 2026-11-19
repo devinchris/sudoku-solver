@@ -2,4 +2,27 @@
 .venv/
 __pycache__/
 .DS_Store
+
+# Latex stuff
+# LaTeX-Hilfsdateien
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lol
+*.lot
+*.nlg
+*.nlo
+*.nls
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
 *.pdf
