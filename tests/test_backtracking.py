@@ -37,8 +37,17 @@ def test_solver_solves_generated_puzzles(solver, seed):
     assert is_solved(original, grid)
 
 
-def test_stack_solve_rejects_invalid_grid(invalid):
-    assert stack_solve(invalid) is False
+@pytest.mark.parametrize("solver", SOLVERS)
+def test_solver_rejects_invalid_grid(solver, invalid):
+    assert solver(invalid) is False
+
+
+@pytest.mark.parametrize("solver", SOLVERS)
+def test_solver_rejects_invalid_full_grid(solver, solution):
+    # completely filled, but the first row contains the 3 twice
+    grid = copy_grid(solution)
+    grid[0][0] = 3
+    assert solver(grid) is False
 
 
 # --- solve_steps ---
@@ -75,3 +84,15 @@ def test_solve_steps_invalid_grid_yields_nothing(invalid):
 def test_solve_steps_unsolvable_never_solved(unsolvable):
     actions = [step.action for step in solve_steps(unsolvable)]
     assert Action.SOLVED not in actions
+
+
+# --- package interface ---
+
+def test_package_exports_public_functions():
+    # the UI uses the package like a module: backtracking.solve(...), backtracking.solve_steps(...)
+    from sudoku_solver.solvers import backtracking
+    for name in backtracking.__all__:
+        assert callable(getattr(backtracking, name))
+    assert backtracking.solve is solve
+    assert backtracking.stack_solve is stack_solve
+    assert backtracking.solve_steps is solve_steps
