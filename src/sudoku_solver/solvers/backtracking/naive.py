@@ -1,9 +1,14 @@
-from sudoku import Sudoku
-from .common import is_solved, is_valid, is_valid_number
+"""Naive backtracking: cells in row-major order, digits 1-9.
+
+solve        recursive
+stack_solve  iterative with an explicit stack, same search tree and order
+solve_steps  like stack_solve, but yields every step (for the visualisation)
+"""
 from collections.abc import Iterator
-from ..core.steps import Step, Action
-from ..core.stack import Stack
-import copy
+
+from ..common import copy_grid, is_valid, is_valid_number
+from ...core.steps import Step, Action
+from ...core.stack import Stack
 
 
 def solve(grid: list[list[int]], r=0, c=0) -> bool:
@@ -13,9 +18,12 @@ def solve(grid: list[list[int]], r=0, c=0) -> bool:
         grid (list[list[int]]): takes the starting point of the sudoku
 
     Returns:
-        list[list[int]]: the solved sudoku
+        bool: is solvable?
     """
 
+    if r == 0 and c == 0 and not is_valid(grid):
+        # only on the first call: the givens themselves must not contradict each other
+        return False
     if r == 9:
         # when at n_row=9 the sudoku shall be named solved
         return True
@@ -36,7 +44,7 @@ def solve(grid: list[list[int]], r=0, c=0) -> bool:
         return False
     
     
-def stack_solve(grid: list[list[int]]) -> list[list[int]]:    
+def stack_solve(grid: list[list[int]]) -> bool:    
     if not is_valid(grid):
         return False
     
@@ -70,8 +78,9 @@ def stack_solve(grid: list[list[int]]) -> list[list[int]]:
     return False
         
 def solve_steps(grid: list[list[int]]) -> Iterator[Step]:
-    # deepcopy is expensive TODO: mit raphael abklären ob auch [row[:] for row in grid] geht (kein geupdatetes grid dann)
-    _grid = copy.deepcopy(grid)
+    # copy_grid copies row by row. For a grid of ints that is a full copy, and much
+    # cheaper than copy.deepcopy, which matters because every step gets its own copy.
+    _grid = copy_grid(grid)
     
     if not is_valid(_grid):
         return  # invalid sudoku
@@ -79,7 +88,7 @@ def solve_steps(grid: list[list[int]]) -> Iterator[Step]:
     empty = [(r, c) for r in range(9) for c in range(9) if _grid[r][c] == 0]
 
     if not empty:
-        yield Step(Action.SOLVED, None, None, None, copy.deepcopy(_grid))
+        yield Step(Action.SOLVED, None, None, None, copy_grid(_grid))
         return
 
     stack = Stack()
@@ -98,14 +107,14 @@ def solve_steps(grid: list[list[int]]) -> Iterator[Step]:
                 _grid[r][c] = n
                 stack.push((index, n))
 
-                yield Step(Action.PLACE, r, c, n, copy.deepcopy(_grid))
+                yield Step(Action.PLACE, r, c, n, copy_grid(_grid))
 
                 if index + 1 == len(empty):
-                    yield Step(Action.SOLVED, None, None, None, copy.deepcopy(_grid))
+                    yield Step(Action.SOLVED, None, None, None, copy_grid(_grid))
                     return
 
                 stack.push((index + 1, 0))
                 break
         else:
             if removed:
-                yield Step(Action.BACKTRACK, r, c, removed, copy.deepcopy(_grid))
+                yield Step(Action.BACKTRACK, r, c, removed, copy_grid(_grid))

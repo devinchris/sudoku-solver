@@ -42,5 +42,6 @@ All code lives in src/sudoku_solver/:
 
 - core: data structures and the SAT core (encoding, DPLL and CDCL)
 - solvers: backtracking solver and helper functions
+  - backtracking: naive solver, heuristics (MRV, forward checking), counting solutions and Knuth's estimator for the size of the search tree. Comparison tables: `python -m sudoku_solver.solvers.backtracking.report`
 - ui: web app in streamlit
 
