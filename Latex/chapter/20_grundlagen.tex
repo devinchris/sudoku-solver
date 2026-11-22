@@ -1,4 +1,5 @@
 \section{Theoretische Grundlagen}\label{sec:grundlagen}
+In diesem Kapitel werden die theoretischen Grundlagen der Arbeit beschrieben. Zunächst wird Sudoku als Entscheidungsproblem formalisiert und komplexitätstheoretisch eingeordnet. Danach werden die beiden Lösungsansätze, das Backtracking und die Reduktion auf das Erfüllbarkeitsproblem der Aussagenlogik, sowie die Grundlagen der Leistungsbewertung eingeführt.
 
 \subsection{Sudoku als Entscheidungsproblem}\label{sec:csp}
 Ein klassisches Sudoku besteht aus einem Gitter mit $9 \times 9$ Zellen, das in neun Zeilen, neun Spalten und neun Blöcke der Größe $3 \times 3$ unterteilt ist. Einige Zellen sind bereits zu Beginn mit Ziffern belegt und werden als Vorgaben bezeichnet. Das Sudoku gilt als gelöst, wenn jede Zelle eine Ziffer von 1 bis 9 enthält und jede Ziffer pro Zeile, Spalte und Block genau einmal vorkommt.
@@ -24,7 +25,20 @@ Für Sudoku gilt diese Einordnung in verallgemeinerter Form. Auf Sudokus der Gr�
 Da Sudoku in NP liegt und SAT NP-vollständig ist, existiert eine polynomielle Reduktion von Sudoku auf SAT. Für ein Sudoku mit Kantenlänge $m$ genügen dabei $m^3$ Variablen und $O(m^4)$ Klauseln. Diese Reduktion bildet die Grundlage des zweiten Lösungsansatzes dieser Arbeit und wird in Abschnitt~\ref{sec:impl-sat} konkret umgesetzt.
 
 
+
+\subsection{Backtracking und Heuristiken}\label{sec:backtracking}
+Beim Backtracking wird die Konsistenz bereits nach jeder gesetzten Ziffer geprüft \vgl{russell2021}. Heuristiken dienen dazu, die Suche an den aktuellen Zustand anzupassen \vgl{russell2021}. Algorithmus, Implementierung und Heuristiken werden in Kapitel~\ref{sec:bt} ausführlich beschrieben.
+
+
+\subsection{Aussagenlogik und das SAT-Problem}\label{sec:gl-sat}
+Beim Erfüllbarkeitsproblem der Aussagenlogik (SAT) wird gefragt, ob eine Belegung existiert, die eine aussagenlogische Formel erfüllt. SAT war das erste Problem, dessen NP-Vollständigkeit bewiesen wurde. \vgl[151\psq]{cook1971} Die Formeln liegen dabei üblicherweise in konjunktiver Normalform vor, also als Konjunktion von Klauseln \vgl[204]{davis1960}. Die Kodierung eines Sudokus als solche Formel wird in Abschnitt~\ref{sec:sat-encoding} beschrieben.
+
+
+\subsection{Der DPLL-Algorithmus}\label{sec:gl-dpll}
+Der DPLL-Algorithmus entstand, indem ein Schritt des Verfahrens von Davis und Putnam durch Verzweigen mit Backtracking ersetzt wurde, und ist nach Davis, Putnam, Logemann und Loveland benannt \vgl[394]{davis1962}. Der Ablauf des Algorithmus und seine Erweiterung zu CDCL werden in Abschnitt~\ref{sec:algorithms} beschrieben.
+
 \subsection{Leistungsbewertung von Lösungsverfahren}\label{sec:leistungsbewertung}
+Um Lösungsverfahren vergleichen zu können, muss zunächst festgelegt werden, was gemessen wird und wie die Messwerte ausgewertet werden. Im Folgenden werden deshalb zuerst Maße für Zeit und Aufwand beschrieben und danach die statistischen Verfahren, mit denen Unterschiede zwischen Verfahren abgesichert werden.
 \subsubsection{Zeit- und Aufwandsmaße}\label{sec:zeitmasse}
 Die Python-Standardbibliothek stellt unter anderem zwei Uhren bereit. Der \texttt{perf\_counter} ist die Uhr mit der höchsten verfügbaren Auflösung für kurze Zeitspannen und zählt auch die Zeit, in der ein Programm schläft. Die \texttt{process\_time} liefert die Summe aus System- und Benutzer-CPU-Zeit des aktuellen Prozesses und zählt Schlafzeit nicht mit. \vgl{pythontime} Die Wanduhrzeit allein reicht nicht immer aus, weil sie mehrfädige Programme nicht sinnvoll vergleicht und von Ein- und Ausgabe beeinflusst wird. Die CPU-Zeit ist aussagekräftiger, aber schwieriger zu messen \vgl[S.~2]{beyer2019}.
 
