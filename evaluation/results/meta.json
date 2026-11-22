@@ -1,0 +1,111 @@
+{
+ "befehl": "/Users/die/Documents/DHBW/sudoku-solver/evaluation/__main__.py all",
+ "experimente": [
+  "e1",
+  "e4",
+  "e5",
+  "e6",
+  "e7",
+  "e8",
+  "e9",
+  "e10"
+ ],
+ "umgebung": {
+  "zeitpunkt": "2026-11-21T16:34:24+01:00",
+  "betriebssystem": "Darwin 24.6.0",
+  "os_version": "Darwin Kernel Version 24.6.0: Wed Nov  5 21:33:59 PST 2025; root:xnu-11417.140.69.705.2~1/RELEASE_ARM64_T8112",
+  "rechner": "arm64",
+  "cpu": "Apple M2",
+  "logische_kerne": 8,
+  "python": "3.14.3",
+  "python_implementierung": "CPython",
+  "py_sudoku": "2.0.0",
+  "pandas": "3.1.1",
+  "numpy": "2.5.5",
+  "uhren_aufloesung": {
+   "perf_counter_ns": 41,
+   "process_time_ns": 1000
+  },
+  "last_beim_start_1min": 3.05,
+  "git_commit": "fa31890033c211e206f24dee0c9457b00fd08036",
+  "git_unsauber": true,
+  "manuell_eintragen": {
+   "netzbetrieb": null,
+   "energiesparmodus_aus": null,
+   "andere_programme_geschlossen": null
+  }
+ },
+ "einstellungen": {
+  "n": 100,
+  "zeitlimit_s": 20.0,
+  "par_faktor": 2,
+  "wiederholungen": 5,
+  "nicht_wiederholen_ueber_s": 2.0,
+  "gc_aus_waehrend_zeitnahme": true,
+  "stufen_leer": [
+   0.3,
+   0.4,
+   0.5,
+   0.55,
+   0.6,
+   0.65,
+   0.7
+  ],
+  "ablation_stufen": [
+   0.5,
+   0.6,
+   0.7
+  ],
+  "n_ablation": 50,
+  "cdcl_konfigurationen": {
+   "Standard": {},
+   "ohne Phase-Saving": {
+    "phase_saving": false
+   },
+   "ohne Restarts": {
+    "restarts": false
+   },
+   "ohne Klausel-Löschung": {
+    "deletion": false
+   },
+   "Anfangsphase wahr": {
+    "initial_phase": true
+   },
+   "Heuristik shortest (statt VSIDS)": {
+    "heuristic": "shortest"
+   },
+   "alles aus": {
+    "phase_saving": false,
+    "restarts": false,
+    "deletion": false
+   }
+  },
+  "dpll_heuristiken": [
+   "shortest",
+   "shortest_any",
+   "jw",
+   "first"
+  ],
+  "replication": false,
+  "eval_seed_base": 1000000,
+  "py_sudoku_gepinnt": "2.0.0"
+ },
+ "raetselmengen_hash": {
+  "eindeutig_0.3.json": "2583869536613c7ef26f904dd344a5ccae18c65ccf4145de443c6be9056a32b0",
+  "eindeutig_0.4.json": "258c3b7c6a3bfa8037f7f8d50c75b87a13c72831c4c4dd1594eaf4f9e6a9986d",
+  "eindeutig_0.5.json": "47e1e561646c96b7314e74f5087621c27dbe32f63da96a7a861513dad0cc84ab",
+  "eindeutig_0.55.json": "69091dd94f0bd9337b1e7850bc6e7089c35fc24910079459a4972653d02295fe",
+  "eindeutig_0.6.json": "f21b6f5c1ec6332e0cc0f52743777cc58003943c5845a5fdae61389d6542a159",
+  "eindeutig_0.65.json": "020ad3d411e76c5a238e93b9c3c9f5cb9ed7184d59e96f700f9da10697159473",
+  "eindeutig_0.7.json": "51a04bc8da06b98e96bb8085fcddc1c61764783ab2fce5701468099eeae9b97f",
+  "schwer.json": "5217c4f707918a3bee37124f60ed2422f436ee78c4bdd412164d2fa7d8baddf8",
+  "unloesbar.json": "889b00eaace79205477340f3d06e5d7a120f76aeee17ecd4d731cdc53bcb02cd",
+  "zufall_0.3.json": "6cf254a0232ba28063532d459c496c564f16d0651b811ac44a068e070452e778",
+  "zufall_0.4.json": "eefc90ef6cafa2544dbc86b72e9a9a6eb1663bd008b164a3aedf749c4ba146a4",
+  "zufall_0.5.json": "8cb59c4210015d476c105e1aae687d6e6524685ede60dbdaba533cdd081f443d",
+  "zufall_0.55.json": "2be1cf42068e993e0ec174a73d0ef08c388bf5a7ba58d30651a18b5679955728",
+  "zufall_0.6.json": "f7bf8e49a58f98578e5cc5c3dd49811a4aa98321008650485c4b47cc3025cf34",
+  "zufall_0.65.json": "89ad545eafb1bc9c9d0408874d63b1e0f492f71f00d7f68bb3d99b7b4ba0a26f",
+  "zufall_0.7.json": "3cb67eeabcbf8a02f405e27cc1a1e8e58d3f3566cbd9900cd8cd47ec3e5f4355"
+ }
+}

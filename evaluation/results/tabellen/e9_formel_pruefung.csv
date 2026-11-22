@@ -1,0 +1,15 @@
+level,extended,n_geprueft,alle_stimmen,n_leer_min,n_leer_max
+0.3,False,10,True,24,24
+0.3,True,10,True,24,24
+0.4,False,10,True,32,32
+0.4,True,10,True,32,32
+0.5,False,10,True,40,40
+0.5,True,10,True,40,40
+0.55,False,10,True,44,44
+0.55,True,10,True,44,44
+0.6,False,10,True,48,48
+0.6,True,10,True,48,48
+0.65,False,10,True,52,52
+0.65,True,10,True,52,52
+0.7,False,10,True,56,56
+0.7,True,10,True,56,56
