@@ -1,10 +1,17 @@
 \section{SAT-basierter Solver} \label{sec:sat}
 
+Dieses Kapitel beschreibt einen Sudoku-Solver, der das Rätsel als aussagenlogische Formel formuliert und mit einem \acs{SAT}-Solver löst.
+Das Lösen durchläuft drei Schritte: Das Gitter wird in Klauseln kodiert, ein \acs{SAT}-Solver sucht ein Modell, und dieses Modell wird zurück in ein ausgefülltes Gitter übersetzt.
+Abschnitt~\ref{sec:sat-encoding} führt \acs{SAT} ein und beschreibt die Kodierung, Abschnitt~\ref{sec:algorithms} die Suchalgorithmen DPLL und \acs{CDCL} und Abschnitt~\ref{sec:implementation} deren Implementierung.
+
 \subsection{SAT und die Sudoku-Kodierung} \label{sec:sat-encoding}
+
+Die Solver in diesem Kapitel arbeiten auf aussagenlogischen Formeln in \emph{konjunktiver Normalform} (\acs{KNF})\acused{KNF}.
+Damit ein \acs{SAT}-Solver ein Sudoku lösen kann, müssen dessen Regeln daher als \acs{KNF}-Formel vorliegen.
+Abschnitt~\ref{sec:sat-cnf} führt die nötigen Grundbegriffe ein, Abschnitt~\ref{sec:encoding} übersetzt darauf aufbauend die Sudoku-Regeln in Klauseln.
 
 \subsubsection{SAT und KNF} \label{sec:sat-cnf}
 
-Die Solver in diesem Kapitel arbeiten auf aussagenlogischen Formeln in \emph{konjunktiver Normalform} (\acs{KNF})\acused{KNF}.
 Ein \emph{Literal} ist eine boolesche Variable $x$ oder ihre Negation $\neg x$.
 Eine \emph{Klausel} ist eine Disjunktion von Literalen. Sie ist erfüllt, sobald eines ihrer Literale wahr ist.
 Eine \acs{KNF}-Formel ist eine Konjunktion von Klauseln \vgl[204]{davis1960}, zum Beispiel
@@ -86,11 +93,14 @@ Die zusätzlichen Klauseln zahlen sich aus, sobald der Solver suchen muss: Bei d
 
 \subsection{Algorithmen} \label{sec:algorithms}
 
+Beide Solver dieses Kapitels gehen auf den DPLL-Algorithmus zurück.
+Abschnitt~\ref{sec:dpll} beschreibt DPLL, Abschnitt~\ref{sec:cdcl} dessen Erweiterung \acs{CDCL}, die aus Konflikten lernt.
+Beide Algorithmen propagieren auf dieselbe Weise und unterscheiden sich nur im Umgang mit Konflikten; Abschnitt~\ref{sec:comparison} stellt sie gegenüber.
+
 \subsubsection{DPLL} \label{sec:dpll}
 
 Das erste Verfahren für \acs{SAT} eliminierte Variablen durch Resolution und benötigte in der Praxis zu viel Speicher \parencites[vgl.][210]{davis1960}[394]{davis1962}.
 Die Ersetzung dieses Schritts durch Verzweigen mit Backtracking führte zum DPLL-Algorithmus, benannt nach Davis, Putnam, Logemann und Loveland \vgl[394]{davis1962}.
-Er bildet die Grundlage aller Solver in diesem Kapitel.
 
 DPLL vereinfacht die Formel zunächst so weit wie möglich.
 Die wichtigste Regel ist die \emph{Unit Propagation}: Sind alle Literale einer Klausel bis auf eines falsch, muss das verbleibende Literal wahr sein.
@@ -148,7 +158,6 @@ Die Nützlichkeit wird über die \emph{\acl{LBD}} (\acs{LBD})\acused{LBD} gemess
 
 \subsubsection{DPLL vs.\ CDCL} \label{sec:comparison}
 
-Beide Algorithmen propagieren auf dieselbe Weise und unterscheiden sich nur im Umgang mit Konflikten.
 Tabelle~\ref{tab:dpll-vs-cdcl} fasst die Unterschiede zusammen.
 
 \begin{table}[htb]
@@ -188,10 +197,12 @@ Von drei $16 \times 16$-Rätseln mit eindeutiger Lösung löste DPLL dagegen kei
 
 \subsection{Implementierung} \label{sec:implementation}
 
+Die beiden \acs{SAT}-Solver, DPLL und \acs{CDCL}, wurden ohne \acs{SAT}-Bibliothek in Python implementiert.
+Abschnitt~\ref{sec:architecture} beschreibt die gemeinsame Architektur, die Abschnitte~\ref{sec:dpll-impl} und~\ref{sec:cdcl-impl} die Datenstrukturen der beiden Solver und Abschnitt~\ref{sec:trace} das Suchprotokoll, auf dem die Visualisierung aufbaut.
+
 \subsubsection{Architektur} \label{sec:architecture}
 
-Die beiden \acs{SAT}-Solver, DPLL und \acs{CDCL}, wurden ohne \acs{SAT}-Bibliothek implementiert.
-Das Lösen eines Sudokus durchläuft drei Schritte.
+Die Implementierung folgt den drei Schritten aus der Einleitung dieses Kapitels.
 \texttt{encode} wandelt das Gitter in eine Liste von Klauseln und die Anzahl der Variablen um (Abschnitt~\ref{sec:encoding}).
 Anschließend sucht einer der \acs{SAT}-Solver ein Modell, und \texttt{decode\_model} wandelt die wahren Variablen dieses Modells zurück in ein ausgefülltes Gitter.
 Findet der Solver kein Modell, hat das Rätsel keine Lösung.
