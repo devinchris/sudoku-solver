@@ -1,0 +1,318 @@
+\section{SAT-basierter Solver} \label{sec:sat}
+
+\subsection{SAT und die Sudoku-Kodierung} \label{sec:sat-encoding}
+
+\subsubsection{SAT und KNF} \label{sec:sat-cnf}
+
+Die Solver in diesem Kapitel arbeiten auf aussagenlogischen Formeln in \emph{konjunktiver Normalform} (\acs{KNF})\acused{KNF}.
+Ein \emph{Literal} ist eine boolesche Variable $x$ oder ihre Negation $\neg x$.
+Eine \emph{Klausel} ist eine Disjunktion von Literalen. Sie ist erfüllt, sobald eines ihrer Literale wahr ist.
+Eine \acs{KNF}-Formel ist eine Konjunktion von Klauseln \vgl[204]{davis1960}, zum Beispiel
+\[
+    F = (x_1 \lor \neg x_2) \land (x_2 \lor x_3) \land (\neg x_1 \lor \neg x_3).
+\]
+Eine Belegung mit Wahrheitswerten, die jede Klausel erfüllt, ist ein \emph{Modell} von $F$.
+Hier ist $x_1 = x_2 = \text{wahr}$ und $x_3 = \text{falsch}$ ein solches.
+Das \emph{\acl{SAT}} (\acs{SAT})\acused{SAT} fragt, ob eine Formel ein Modell hat.
+
+\acs{SAT} war das erste Problem, dessen NP-Vollständigkeit bewiesen wurde \vgl[151\psq]{cook1971}. Daher ist kein Algorithmus bekannt, der jede Instanz in Polynomialzeit löst.
+Die beiden möglichen Antworten unterscheiden sich darin, wie schwer sie zu überprüfen sind.
+Ein Modell lässt sich in linearer Zeit verifizieren, indem jede Klausel ausgewertet wird.
+Für die Antwort \enquote{unerfüllbar} ist im Allgemeinen kein kurzes Zertifikat bekannt.
+Die Beschränkung der Eingabe auf \acs{KNF} ist keine Einschränkung der Allgemeinheit: Jede aussagenlogische Formel lässt sich in eine erfüllbarkeitsäquivalente \acs{KNF}-Formel linearer Größe umformen \vgl[115\psq]{tseitin1970}.
+Sudoku benötigt diesen Schritt nicht, da sich seine Regeln direkt als Klauseln formulieren lassen (Abschnitt~\ref{sec:encoding}).
+
+Die Implementierung verwendet die ganzzahlige Notation des DIMACS-Formats, des gängigen Eingabeformats von \acs{SAT}-Solvern \vgl[2\psq]{dimacs1993}.
+Die Variablen werden ab 1 nummeriert, das Literal $x_i$ wird als $i$ und $\neg x_i$ als $-i$ geschrieben, und eine Klausel ist eine Liste solcher ganzen Zahlen.
+Aus $F$ wird damit \texttt{[[1, -2], [2, 3], [-1, -3]]}.
+
+\subsubsection{Kodierung} \label{sec:encoding}
+
+Die Kodierung folgt Lynce und Ouaknine~\parencite*[3\psqq]{lynce2006}.
+Für jede Zelle $(r, c)$ und jede Ziffer $d$ gibt es eine boolesche Variable $x_{r,c,d}$, die genau dann wahr ist, wenn Zelle $(r, c)$ die Ziffer $d$ enthält.
+Ein $n \times n$-Gitter benötigt daher $n^3$ Variablen, ein $9 \times 9$-Gitter also 729.
+Die Implementierung nummeriert sie als
+\[
+    \mathrm{var}(r, c, d) = r \cdot n^2 + c \cdot n + d,
+    \quad \text{mit } r, c \in \{0, \dots, n-1\} \text{ und } d \in \{1, \dots, n\}.
+\]
+Damit werden die Variablen lückenlos und eineindeutig auf $1, \dots, n^3$ abgebildet, wie es die DIMACS-Notation verlangt.
+Das Dekodieren eines Modells ist die Umkehrrechnung zur Basis $n$.
+
+Die Sudoku-Regeln werden zu vier Gruppen von Klauseln (Tabelle~\ref{tab:clause-groups}).
+Zwei Gruppen fordern, dass etwas mindestens einmal gilt (\emph{\acl{ALO}}, \acs{ALO})\acused{ALO}, jeweils als eine einzige lange Klausel.
+Die beiden anderen fordern, dass etwas höchstens einmal gilt (\emph{\acl{AMO}}, \acs{AMO})\acused{AMO}.
+Sie werden paarweise kodiert: eine binäre Klausel für jedes Paar von Literalen, die nicht beide wahr sein dürfen.
+Zusätzlich fügt jede vorgegebene Ziffer $g$ in Zelle $(r, c)$ die Unit-Klausel $(x_{r,c,g})$ hinzu.
+
+\begin{table}[htb]
+    \centering
+    \caption{Klauselgruppen der Kodierung. $U$ ist eine Einheit: eine der $n$ Zeilen, $n$ Spalten oder $n$ Blöcke.}
+    \label{tab:clause-groups}
+    \small
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X l l r@{}}
+        \toprule
+        Gruppe & Klauseln & Anzahl & $9 \times 9$ \\
+        \midrule
+        \textbf{Zelle definiert} (\acs{ALO}): jede Zelle enthält mindestens eine Ziffer
+            & $\bigwedge_{r,c} (x_{r,c,1} \lor \dots \lor x_{r,c,n})$
+            & $n^2$ & 81 \\
+        \textbf{Zelle eindeutig} (\acs{AMO}): jede Zelle enthält höchstens eine Ziffer
+            & $\bigwedge_{r,c} \bigwedge_{d < d^{\prime}} (\neg x_{r,c,d} \lor \neg x_{r,c,d^{\prime}})$
+            & $n^2 \binom{n}{2}$ & 2.916 \\
+        \textbf{Einheit eindeutig} (\acs{AMO}): jede Ziffer kommt höchstens einmal pro Einheit vor
+            & $\bigwedge_{U,d} \bigwedge_{(r,c) < (r^{\prime},c^{\prime}) \in U} (\neg x_{r,c,d} \lor \neg x_{r^{\prime},c^{\prime},d})$
+            & $3n \cdot n \binom{n}{2}$ & 8.748 \\
+        \textbf{Einheit definiert} (\acs{ALO}): jede Ziffer kommt mindestens einmal pro Einheit vor
+            & $\bigwedge_{U,d} \bigvee_{(r,c) \in U} x_{r,c,d}$
+            & $3n \cdot n$ & 243 \\
+        \bottomrule
+    \end{tabularx}
+    \par\smallskip
+    {\footnotesize Quelle: eigene Darstellung in Anlehnung an Lynce und Ouaknine~\parencite*[4\psq]{lynce2006}.}
+\end{table}
+
+Die \emph{minimale Kodierung} besteht nur aus den Gruppen \enquote{Zelle definiert} und \enquote{Einheit eindeutig} und ist bereits korrekt.
+Eine Einheit hat $n$ Zellen, von denen jede mindestens eine Ziffer enthält, während jede der $n$ Ziffern höchstens einmal vorkommen darf.
+Also enthält jede Zelle genau eine Ziffer (Schubfachprinzip).
+Die beiden anderen Gruppen sind daher redundant.
+Die \emph{erweiterte Kodierung} fügt sie dennoch hinzu: Sie ändern die Lösungsmenge nicht, geben dem Solver aber mehr zu propagieren.
+So kann die Unit Propagation (Abschnitt~\ref{sec:dpll}) mithilfe von \enquote{Einheit definiert} eine Ziffer setzen, die nur in eine einzige Zelle einer Einheit passt. Menschliche Löser nennen dies ein \emph{Hidden Single}.
+
+Für ein $9 \times 9$-Gitter hat die minimale Kodierung 8.829 Klauseln und die erweiterte 11.988, was mit Lynce und Ouaknine~\parencite*[4\psq]{lynce2006} übereinstimmt.
+Beide wachsen mit $O(n^4)$.
+Die zusätzlichen Klauseln zahlen sich aus, sobald der Solver suchen muss: Bei drei $16 \times 16$-Rätseln mit eindeutiger Lösung benötigte der \acs{CDCL}-Solver aus Abschnitt~\ref{sec:cdcl} im Median 3.134 Konflikte mit der minimalen und 71 mit der erweiterten Kodierung.
+
+\subsection{Algorithmen} \label{sec:algorithms}
+
+\subsubsection{DPLL} \label{sec:dpll}
+
+Das erste Verfahren für \acs{SAT} eliminierte Variablen durch Resolution und benötigte in der Praxis zu viel Speicher \parencites[vgl.][210]{davis1960}[394]{davis1962}.
+Die Ersetzung dieses Schritts durch Verzweigen mit Backtracking führte zum DPLL-Algorithmus, benannt nach Davis, Putnam, Logemann und Loveland \vgl[394]{davis1962}.
+Er bildet die Grundlage aller Solver in diesem Kapitel.
+
+DPLL vereinfacht die Formel zunächst so weit wie möglich.
+Die wichtigste Regel ist die \emph{Unit Propagation}: Sind alle Literale einer Klausel bis auf eines falsch, muss das verbleibende Literal wahr sein.
+Dessen Belegung kann weitere Klauseln zu Unit-Klauseln machen, daher wird die Regel wiederholt, bis keine solche Klausel mehr übrig ist.
+Optional belegt die \emph{Pure-Literal-Regel} zusätzlich jede Variable, die nur mit einem Vorzeichen vorkommt, so, dass alle ihre Vorkommen wahr sind.
+Enthält danach eine Klausel nur noch falsche Literale, führt die aktuelle Belegung zu einem Konflikt.
+Ist jede Klausel erfüllt, ist die Formel erfüllbar.
+Andernfalls \emph{verzweigt} DPLL: Es wählt eine freie Variable $x$, setzt sie auf wahr und beginnt erneut mit der Propagation.
+Führt dies zu einem Konflikt, kehrt der Solver per Backtracking zurück und versucht stattdessen $x = \text{falsch}$.
+Scheitern beide Werte, wird der Konflikt an die vorherige Verzweigung weitergereicht \parencites[vgl.][209--212]{davis1960}[394\psq]{davis1962}.
+
+Beide Vereinfachungsregeln erhalten die Erfüllbarkeit, und die Verzweigung probiert beide Werte jeder gewählten Variable aus.
+Daher terminiert DPLL stets mit der korrekten Antwort; diese lautet \enquote{unerfüllbar}, sobald beide Werte der ersten gewählten Variable gescheitert sind.
+Im schlechtesten Fall probiert es jedoch weiterhin alle $2^V$ Belegungen von $V$ Variablen aus.
+
+Auf Sudoku angewandt führt die Unit Propagation die grundlegenden Züge menschlicher Löser aus.
+Eine gesetzte Ziffer wird als Kandidat aus den übrigen Zellen ihrer Einheiten entfernt (\enquote{Einheit eindeutig}).
+Eine Zelle mit nur noch einem Kandidaten, ein \emph{Naked Single}, wird über \enquote{Zelle definiert} gefüllt.
+Ein \emph{Hidden Single}, also eine Ziffer, die nur in eine einzige Zelle einer Einheit passt, benötigt \enquote{Einheit definiert} und wird daher nur mit der erweiterten Kodierung gefunden.
+Das Verzweigen entspricht dem Raten.
+
+\subsubsection{CDCL} \label{sec:cdcl}
+
+Gerät DPLL in einen Konflikt, macht es nur die letzte Entscheidung rückgängig und vergisst, warum der Konflikt entstanden ist.
+Dieselbe Kombination von Belegungen kann daher in anderen Teilen der Suche immer wieder denselben Konflikt verursachen.
+\emph{Conflict-driven clause learning} (\acs{CDCL})\acused{CDCL} analysiert stattdessen jeden Konflikt.
+Es fügt die Ursache als neue Klausel zur Formel hinzu und springt direkt dorthin zurück, wo diese Ursache begann \vgl[509\psqq]{marquessilva1999}.
+Zusammen mit den Techniken des Chaff-Solvers \vgl[530\psqq]{moskewicz2001} bildet dies die Grundlage praktisch aller modernen \acs{SAT}-Solver.
+
+\acs{CDCL} behält die Unit Propagation von DPLL bei, speichert aber mehr Informationen.
+Jede Entscheidung eröffnet eine neue \emph{Entscheidungsebene}.
+Jedes danach propagierte Literal gehört zu dieser Ebene und merkt sich seinen \emph{Grund}: die Klausel, die zur Unit-Klausel wurde und es erzwungen hat.
+Entscheidungen und Gründe bilden den \emph{Implikationsgraphen}: Seine Knoten sind die belegten Literale, und jedes propagierte Literal hat eingehende Kanten von den übrigen, falschen Literalen seines Grundes.
+Ein Konflikt ist eine Klausel, deren Literale alle falsch sind.
+
+Die Konfliktanalyse durchläuft diesen Graphen rückwärts, ausgehend von der Konfliktklausel.
+In jedem Schritt resolviert sie die aktuelle Klausel mit dem Grund ihres zuletzt belegten Literals der aktuellen Ebene, wodurch dieses Literal durch seine Ursachen ersetzt wird.
+Sie endet, sobald genau ein Literal der aktuellen Ebene übrig ist.
+Dieses Literal ist der \emph{first \acl{UIP}} (first \acs{UIP})\acused{UIP}: die dem Konflikt nächstgelegene Belegung, durch die jeder Pfad von der aktuellen Entscheidung zum Konflikt verläuft \vgl[280\psqq]{zhang2001}.
+Die resultierende Klausel enthält den negierten \acs{UIP} und ansonsten nur Literale früherer Ebenen.
+Da sie durch Resolution hergeleitet wird, folgt sie aus der Formel und ändert deren Erfüllbarkeit nicht.
+Sie schließt die Kombination von Belegungen aus, die den Konflikt verursacht hat.
+
+Anschließend führt der Solver einen \emph{Backjump} zur zweithöchsten Entscheidungsebene der gelernten Klausel aus, bzw. zu Ebene 0, wenn die Klausel nur ein Literal enthält.
+Auf dieser Ebene sind alle ihre Literale außer dem negierten \acs{UIP} falsch, sodass die Klausel eine Unit-Klausel ist und sofort eine neue Belegung erzwingt.
+Ebenen, deren Entscheidungen für den Konflikt keine Rolle spielten, werden vollständig übersprungen, anders als beim chronologischen Backtracking von DPLL.
+Da jede gelernte Klausel eine Belegung ausschließt, die bereits zu einem Konflikt geführt hat, terminiert die Suche weiterhin.
+
+Vier weitere Techniken entscheiden darüber, wie gut dies in der Praxis funktioniert.
+Die \acs{VSIDS}-Heuristik wählt die Entscheidungsvariablen: Variablen, die an jüngsten Konflikten beteiligt waren, erhalten einen höheren Score, und alle Scores klingen mit der Zeit ab, sodass der Solver dort verzweigt, wo die letzten Konflikte auftraten \vgl[531\psq]{moskewicz2001}.
+\emph{Restarts} setzen die Suche in Abständen, die durch die Luby-Folge vorgegeben sind, auf Ebene 0 zurück, behalten aber die gelernten Klauseln und die Scores bei, damit eine ungünstige frühe Entscheidung den Solver nicht festhält \parencites[vgl.][532]{moskewicz2001}[178]{luby1993}.
+Beim \emph{Phase Saving} erhält eine Entscheidungsvariable den Wert, den sie zuletzt hatte, statt eines festen Werts; dies führt die Suche nach einem Restart zu vielversprechenden Belegungen zurück \vgl[297]{pipatsrisawat2007}.
+Schließlich kosten gelernte Klauseln Speicher und verlangsamen die Propagation, weshalb der Solver regelmäßig die weniger nützliche Hälfte von ihnen löscht.
+Die Nützlichkeit wird über die \emph{\acl{LBD}} (\acs{LBD})\acused{LBD} gemessen, die Anzahl verschiedener Entscheidungsebenen in einer Klausel. Klauseln mit niedriger \acs{LBD} werden behalten \vgl[401\psq]{audemard2009}.
+
+\subsubsection{DPLL vs.\ CDCL} \label{sec:comparison}
+
+Beide Algorithmen propagieren auf dieselbe Weise und unterscheiden sich nur im Umgang mit Konflikten.
+Tabelle~\ref{tab:dpll-vs-cdcl} fasst die Unterschiede zusammen.
+
+\begin{table}[htb]
+    \centering
+    \caption{DPLL und \acs{CDCL} im Vergleich}
+    \label{tab:dpll-vs-cdcl}
+    \small
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.6cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+        \toprule
+         & DPLL & \acs{CDCL} \\
+        \midrule
+        Reaktion auf einen Konflikt
+            & versucht den entgegengesetzten Wert der letzten offenen Entscheidung
+            & lernt eine Klausel, die durch Propagation eine neue Belegung erzwingt \\
+        Backtracking
+            & chronologisch, jeweils eine Ebene
+            & nicht chronologisch, zur zweithöchsten Ebene der gelernten Klausel \\
+        Gedächtnis für frühere Konflikte
+            & keines
+            & gelernte Klauseln, nach \acs{LBD} ausgedünnt \\
+        Reihenfolge der Entscheidungen
+            & Verzweigungsheuristik, unabhängig von Konflikten
+            & \leavevmode\acs{VSIDS}, folgt jüngsten Konflikten \\
+        Restarts
+            & nein
+            & ja, gelernte Klauseln bleiben erhalten \\
+        \bottomrule
+    \end{tabularx}
+    \par\smallskip
+    {\footnotesize Quelle: eigene Darstellung.}
+\end{table}
+
+Der Unterschied zeigt sich erst, wenn der Solver suchen muss.
+Bei 20~$9 \times 9$-Rätseln mit eindeutiger Lösung und der minimalen Kodierung mussten beide Solver kaum suchen: DPLL benötigte im Median 24 Konflikte und 0,03\,s, \acs{CDCL} 9 Konflikte und 0,02\,s.
+Von drei $16 \times 16$-Rätseln mit eindeutiger Lösung löste DPLL dagegen keines innerhalb des Zeitlimits von 20\,s, während \acs{CDCL} alle drei in einem Median von 1,3\,s löste.
+
+\subsection{Implementierung} \label{sec:implementation}
+
+\subsubsection{Architektur} \label{sec:architecture}
+
+Die beiden \acs{SAT}-Solver, DPLL und \acs{CDCL}, wurden ohne \acs{SAT}-Bibliothek implementiert.
+Das Lösen eines Sudokus durchläuft drei Schritte.
+\texttt{encode} wandelt das Gitter in eine Liste von Klauseln und die Anzahl der Variablen um (Abschnitt~\ref{sec:encoding}).
+Anschließend sucht einer der \acs{SAT}-Solver ein Modell, und \texttt{decode\_model} wandelt die wahren Variablen dieses Modells zurück in ein ausgefülltes Gitter.
+Findet der Solver kein Modell, hat das Rätsel keine Lösung.
+
+Alle \acs{SAT}-Solver teilen dieselbe Schnittstelle, \texttt{solve\_cnf(clauses, num\_vars)}.
+Sie gibt ein Modell zurück, das für jede Variable genau ein Literal, $v$ oder $-v$, enthält, oder \texttt{None}, falls die Formel unerfüllbar ist, und lässt die Klauseln unverändert.
+Zwei optionale Argumente sind allen Solvern gemeinsam: \texttt{stats} erfasst die Anzahl der Entscheidungen, Propagationen und Konflikte, und \texttt{trace} zeichnet jeden Suchschritt auf (Abschnitt~\ref{sec:trace}).
+Das Aufzeichnen eines Protokolls verlangsamt einen Solver um 30\,\% bis hin zum Faktor 2,3.
+Ohne Protokoll wird der Aufzeichnungscode übersprungen, und die verbleibenden Prüfungen kosten weniger als 5\,\% der Laufzeit, was innerhalb des Messrauschens liegt.
+Dank dieser Schnittstelle lassen sich die Solver beliebig austauschen und an jeder \acs{KNF}-Formel testen, nicht nur an Sudoku.
+
+Nichts im Code hängt von einer festen Gittergröße ab.
+Jede Funktion leitet $n$ aus dem Gitter und die Blockgröße $b = \sqrt{n}$ aus $n$ ab, sodass derselbe Code $4 \times 4$-, $9 \times 9$- und $16 \times 16$-Gitter verarbeitet.
+
+\subsubsection{Vom einfachen zum effizienten DPLL} \label{sec:dpll-impl}
+
+Die erste DPLL-Implementierung folgt Abschnitt~\ref{sec:dpll} wörtlich.
+Sie ist rekursiv, und jede Belegung erzeugt eine neue, vereinfachte Kopie der Formel ohne die erfüllten Klauseln und die falschen Literale.
+Dadurch ist sie leicht zu überprüfen, doch jeder Suchschritt kostet Zeit proportional zur Größe der gesamten Formel.
+
+Die effiziente Version führt dieselbe Suche mit anderen Datenstrukturen durch.
+Statt die Formel zu kopieren, führt sie einen \emph{Trail}: die Liste der belegten Literale in der Reihenfolge, in der sie gesetzt wurden.
+Backtracking kürzt den Trail einfach auf die Länge, die er vor der gescheiterten Entscheidung hatte.
+Die offenen Entscheidungen liegen auf einem separaten Stack, sodass die Suche iterativ ist und nicht durch die Rekursionstiefe von Python begrenzt wird.
+
+Die Unit Propagation verwendet \emph{Two Watched Literals} \vgl[531]{moskewicz2001}.
+Jede Klausel beobachtet zwei ihrer Literale, die nicht falsch sind, und wird nur betrachtet, wenn eines davon falsch wird.
+Der Solver sucht dann in der Klausel nach einem anderen nicht falschen Literal, das stattdessen beobachtet wird.
+Gibt es keines, ist die Klausel zur Unit-Klausel oder zum Konflikt geworden.
+Da Backtracking Belegungen nur aufhebt, bleiben die beobachteten Literale gültig und müssen nicht aktualisiert werden.
+
+Entscheidungen folgen der Heuristik \texttt{shortest}: dem ersten freien Literal der kürzesten offenen Klausel, die nur positive Literale enthält.
+Auf Sudoku ist dies die Zelle oder Einheit mit den wenigsten verbleibenden Kandidaten.
+Die Beschränkung auf positive Klauseln ist wichtig: Die offenen binären \acs{AMO}-Klauseln sind stets die kürzesten, und eine Entscheidung \enquote{$x$ ist falsch} bewirkt wenig.
+
+Sobald der Solver suchen muss, sparen diese Änderungen ein bis zwei Größenordnungen ein.
+Auf dem leeren $16 \times 16$-Gitter mit der minimalen Kodierung benötigte die einfache Version 15,9\,s und die effiziente 0,36\,s.
+\acs{CDCL} (Abschnitt~\ref{sec:cdcl-impl}) baut auf demselben Trail und denselben Watched Literals auf.
+
+\subsubsection{CDCL} \label{sec:cdcl-impl}
+
+Der \acs{CDCL}-Solver erweitert den effizienten DPLL.
+Für jede Variable speichert er zusätzlich die Entscheidungsebene und den Grund, also die Klausel, die sie erzwungen hat. Entscheidungen haben keinen Grund.
+Die Konfliktanalyse ist ein einziger Durchlauf rückwärts entlang des Trails (Listing~\ref{lst:analyze}).
+Sie markiert die Variablen der Konfliktklausel und zählt, wie viele davon zur aktuellen Ebene gehören.
+Anschließend nimmt sie das zuletzt belegte markierte Literal vom Trail und fährt, solange noch mehr als ein Literal der aktuellen Ebene offen ist, mit dem Grund dieses Literals fort.
+Ist nur noch eines übrig, ist das gerade entnommene Literal der first \acs{UIP}.
+Literale früherer Ebenen gehen direkt in die gelernte Klausel ein.
+Die Funktion setzt den negierten \acs{UIP} an die erste und ein Literal der Backjump-Ebene an die zweite Stelle, damit diese beiden sofort beobachtet werden können, und berechnet im selben Durchlauf die \acs{LBD}.
+
+% Pseudocode als Listing im Fließtext (nicht gleitend, Eintrag im Listingverzeichnis)
+\par\medskip
+\noindent\begin{minipage}{\linewidth}
+\fcolorbox{black}{boxgray}{%
+\begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+\small
+\begin{algorithmic}[1]
+\Require Konfliktklausel $K_\bot$, deren Literale alle falsch sind
+\Ensure gelernte Klausel $L$, Backjump-Ebene $b$, \acs{LBD} $\ell$
+\Function{Analysiere}{$K_\bot$}
+  \State $e \gets$ aktuelle Entscheidungsebene
+  \State $L \gets [\,\cdot\,]$ \Comment{Platz 0 für das erzwingende Literal}
+  \State $o \gets 0$ \Comment{offene Literale der Ebene $e$}
+  \State $i \gets |T| - 1$ \Comment{$T$: Trail}
+  \State $K \gets K_\bot$; \; $p \gets \text{nil}$
+  \Repeat
+    \ForAll{$q \in K$ mit $q \neq p$}
+      \State $v \gets \operatorname{var}(q)$
+      \If{$v$ nicht markiert \textbf{und} $\operatorname{ebene}(v) > 0$}
+        \State markiere $v$; \; \Call{ErhöheScore}{$v$} \Comment{VSIDS}
+        \If{$\operatorname{ebene}(v) = e$}
+          \State $o \gets o + 1$
+        \Else
+          \State hänge $q$ an $L$ an
+        \EndIf
+      \EndIf
+    \EndFor
+    \While{$\operatorname{var}(T[i])$ nicht markiert} \Comment{zuletzt markiertes Literal}
+      \State $i \gets i - 1$
+    \EndWhile
+    \State $p \gets T[i]$; \; $i \gets i - 1$
+    \State entferne Markierung von $\operatorname{var}(p)$; \; $o \gets o - 1$
+    \If{$o > 0$}
+      \State $K \gets \operatorname{grund}(\operatorname{var}(p))$ \Comment{mit dem Grund von $p$ resolvieren}
+    \EndIf
+  \Until{$o = 0$} \Comment{$p$ ist der first \acs{UIP}}
+  \State $L[0] \gets \neg p$
+  \State entferne Markierungen aller Variablen in $L[1..]$
+  \State $b \gets 0$
+  \If{$|L| > 1$}
+    \State $j \gets$ Index in $L[1..]$ mit höchster Entscheidungsebene \Comment{Backjump-Ebene}
+    \State vertausche $L[1]$ und $L[j]$
+    \State $b \gets \operatorname{ebene}(\operatorname{var}(L[1]))$
+  \EndIf
+  \State $\ell \gets |\{\operatorname{ebene}(\operatorname{var}(q)) : q \in L[1..]\}| + 1$
+  \State \Return $(L, b, \ell)$
+\EndFunction
+\end{algorithmic}
+\end{minipage}}
+\captionof{lstlisting}{First-UIP-Konfliktanalyse als Pseudocode (nach \texttt{analyze} in \texttt{sat/cdcl.py})}
+\label{lst:analyze}
+{\footnotesize Quelle: eigene Darstellung.}
+\end{minipage}
+\par\medskip
+
+Nach dem Backjump wird die gelernte Klausel zum Grund des neu erzwungenen Literals.
+\acs{VSIDS} erhöht den Score jeder während der Analyse markierten Variable.
+Statt nach jedem Konflikt alle Scores zu verringern, erhöht der Solver das Inkrement um den Faktor $1/0{,}95$, was dieselbe Wirkung hat.
+Freie Variablen werden einem Heap entnommen, aus dem veraltete Einträge erst entfernt werden, wenn sie an die Reihe kommen.
+Restarts erfolgen nach $100 \cdot \mathrm{luby}(i)$ Konflikten.
+Ab 2.000 Konflikten löscht der Solver in wachsenden Abständen die Hälfte der gelernten Klauseln mit der höchsten \acs{LBD}, behält aber Klauseln mit einer \acs{LBD} von höchstens 2 sowie Klauseln, die gerade als Grund dienen.
+Jede dieser Techniken lässt sich einzeln abschalten, sodass ihre Wirkung gemessen werden kann.
+
+\subsubsection{Suchprotokoll} \label{sec:trace}
+
+Um die Suche sichtbar zu machen, können beide Solver ein \emph{Protokoll} (\emph{Trace}) aufzeichnen: eine Liste mit einem Eintrag für jeden Suchschritt, die die Visualisierung anschließend Schritt für Schritt abspielen kann.
+Eine Propagation wird mit dem Literal, seiner Entscheidungsebene und seinem Grund protokolliert.
+Weitere Einträge kennzeichnen Entscheidungen, Konflikte und Backtracking, bei \acs{CDCL} zudem gelernte Klauseln, Restarts und das Löschen von Klauseln.
+
+Auf Sudoku übertragen entspricht jeder Eintrag direkt einer Änderung des Gitters.
+Eine auf wahr gesetzte Variable $x_{r,c,d}$ trägt die Ziffer $d$ in Zelle $(r, c)$ ein, eine auf falsch gesetzte entfernt $d$ aus den Kandidaten dieser Zelle.
+Die meisten Schritte sind von der zweiten Art: In einem \acs{CDCL}-Protokoll des schweren $9 \times 9$-Rätsels \enquote{AI Escargot} entfernen 82\,\% aller Einträge einen Kandidaten.
+Ein \acs{SAT}-Solver lässt sich daher am besten auf einem Gitter mit Kandidaten darstellen, nicht als Folge gesetzter Ziffern.
+Mit der minimalen Kodierung umfasst das Protokoll von AI Escargot 1.383 Einträge für DPLL und 11.449 für \acs{CDCL}.
