@@ -1,10 +1,116 @@
-\section{Evaluation}\label{sec:evaluation}
+\providecommand{\plotdir}{../evaluation/plots/}
 
+\section{Evaluierung}\label{sec:evaluation}
+
+In diesem Kapitel werden Backtracking, DPLL und CDCL anhand eigener Messungen auf 9x9-Sudokus verglichen. Betrachtet werden die Laufzeit, der Suchaufwand und die Verlässlichkeit der Verfahren bei steigender Schwierigkeit sowie bei unlösbaren und besonders schweren Rätseln. In Abschnitt~\ref{sec:versuchsaufbau} werden Rätsel, Messung und statistische Auswertung beschrieben. Abschnitt~\ref{sec:ergebnisse} enthält die Ergebnisse, in Abschnitt~\ref{sec:diskussion} werden sie eingeordnet.
 
 \subsection{Versuchsaufbau}\label{sec:versuchsaufbau}
+Mit der Evaluierung sollen vier Fragen beantwortet werden. Wie ändern sich die Laufzeiten von Backtracking, DPLL und CDCL, wenn mehr Felder leer sind? Was kostet die Umwandlung in eine SAT-Formel? Welche Bausteine der SAT-Solver bringen etwas? Wie verhalten sich die Verfahren bei unlösbaren und besonders schweren Rätseln?
 
+Alle Messungen liefen nacheinander auf einem Apple M2 mit acht Kernen unter macOS mit CPython 3.14.3 und py-sudoku 2.0.0. Alle drei Verfahren sind in reinem Python geschrieben. Die Messung importiert den Projektcode und verändert ihn nicht.
+
+Die Schwierigkeit eines Rätsels ist der Anteil leerer Felder. Es gibt sieben Stufen von 30 bis 70 \%. Die Familie \emph{eindeutig} enthält Rätsel mit genau einer Lösung. Sie entstehen, indem aus einer vollständigen Lösung zufällig Felder entfernt werden, solange die Lösung eindeutig bleibt. Dadurch hat die Stufe 70 \% im Mittel nur 55,9 statt 56 leere Felder. Die Familie \emph{zufall} wird wie in der Oberfläche des Projekts erzeugt, ihre Rätsel haben oft mehrere Lösungen, bei 30 \% leeren Feldern in 10 \% und bei 70 \% in allen Rätseln. Der Hauptvergleich nutzt \emph{eindeutig}, \emph{zufall} dient als Gegenprobe. Pro Stufe und Familie gibt es 100 Rätsel, und alle Verfahren lösen dieselben Rätsel. Weitere Experimente verwenden kleinere Mengen von je 50 Rätseln bei 50, 60 und 70 \% leeren Feldern (Heuristiken, Konfigurationen, Kodierungen), unlösbare Rätsel und sechs handverlesene schwere Rätsel.
+
+Jedes Verfahren darf höchstens 20 Sekunden Wanduhrzeit je Rätsel brauchen, sonst wird der Lauf abgebrochen. Ein Abbruch zählt in Median und Perzentilen mit 20 s und im PAR-2-Wert mit 40 s. Die Zeit eines Rätsels ist der Median aus bis zu fünf Läufen, Läufe über 2 s werden nicht wiederholt. Während der Zeitnahme ist die Garbage Collection ausgeschaltet, bei SAT zählt das Erzeugen der Formel mit. Die zusätzlich erfasste CPU-Zeit weicht bei der Hauptmessung bei 90 \% der Läufe um weniger als 0,2 \% von der Wanduhrzeit ab. Diagramme und Tests beruhen auf der Wanduhrzeit. Speicher wurde nicht gemessen.
+
+Je Stufe werden Median mit 95-\%-Bootstrap-Intervall (2000 Wiederholungen), 90. Perzentil, Maximum, Abbruchquote und PAR-2 berichtet. Zwei Verfahren werden gepaart verglichen, und zwar über das geometrische Mittel der Quotienten der Zeiten mit Bootstrap-Intervall und einen Wilcoxon-Test mit Normalapproximation. Das Niveau beträgt 5 \%, korrigiert nach Bonferroni über alle Tests einer Tabelle. Aufwandszähler gehören zu verschiedenen Verfahren und werden nicht auf eine Achse gelegt. Jede Lösung wird auf Gültigkeit geprüft.
 
 \subsection{Ergebnisse}\label{sec:ergebnisse}
+\paragraph{Hauptvergleich.} Tabelle~\ref{tab:e1} zeigt die Laufzeiten auf \emph{eindeutig}, Abbildung~\ref{abb:e1} den Verlauf. Das Backtracking startet bei 30 \% leeren Feldern mit einem Median von 0,19 ms und steigt bei 70 \% auf 126 ms, also auf das 660-Fache. Die SAT-Verfahren bleiben fast flach. CDCL braucht 7,17 ms bei 30 \% und 8,37 ms bei 70 \%, DPLL 8,82 ms und 9,50 ms. Bis 55 \% ist das Backtracking schneller, bei 30 \% etwa 37-mal und bei 55 \% noch knapp 5-mal gegenüber CDCL. Bei 60 \% liegt sein Median mit 4,65 ms unter dem von CDCL mit 7,18 ms, sein 90. Perzentil mit 25,4 ms aber deutlich darüber. Auch der Mittelwert, der hier dem PAR-2-Wert entspricht, ist mit 11,6 ms größer als bei CDCL mit 7,34 ms. Bei 60 \% ist der Unterschied nicht signifikant. Ab 65 \% ist CDCL schneller, um den Faktor 3,2 bei 65 \% und 13,5 bei 70 \%. DPLL liegt in allen Stufen 15 bis 23 \% hinter CDCL.
 
+\begin{table}[htb]
+\centering\small\setlength{\tabcolsep}{3.5pt}
+\caption{Laufzeit in ms auf \emph{eindeutig}. Quotient: geometrisches Mittel der Zeit von Backtracking geteilt durch die von CDCL. Test: Wilcoxon, Backtracking gegen CDCL, Bonferroni-korrigiert. Ohne Entscheidung: Anteil der Rätsel (\%), die CDCL ohne Entscheidung löst.}\label{tab:e1}
+\begin{tabular}{@{}r r r r r r l c r@{}}
+\toprule
+\shortstack[r]{Leer\\(\%)} & \shortstack[r]{BT\\Median} & \shortstack[r]{BT\\p90} & \shortstack[r]{DPLL\\Median} & \shortstack[r]{CDCL\\Median} & Quotient & \shortstack[l]{95-\%-\\Intervall} & \shortstack{signi-\\fikant} & \shortstack[r]{ohne\\Entsch.} \\
+\midrule
+30 & 0,19 & 0,23 & 8,82 & 7,17 & 0,027 & 0,026 bis 0,028 & ja & 100 \\
+40 & 0,29 & 0,51 & 8,79 & 7,16 & 0,045 & 0,043 bis 0,049 & ja & 100 \\
+50 & 0,63 & 2,63 & 8,79 & 7,17 & 0,12 & 0,10 bis 0,14 & ja & 100 \\
+55 & 1,29 & 4,75 & 8,81 & 7,18 & 0,21 & 0,17 bis 0,25 & ja & 89 \\
+60 & 4,65 & 25,4 & 8,81 & 7,18 & 0,64 & 0,50 bis 0,83 & nein & 65 \\
+65 & 31,5 & 175 & 8,90 & 7,50 & 3,24 & 2,33 bis 4,48 & ja & 15 \\
+70 & 126 & 1\,146 & 9,50 & 8,37 & 13,5 & 9,57 bis 19,6 & ja & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.8\textwidth]{\plotdir e1_laufzeit_eindeutig}
+\caption{Median der Laufzeit je Stufe (\emph{eindeutig}), Band: 25. bis 75. Perzentil}\label{abb:e1}
+\end{figure}
+
+Die Zeiten des Backtrackings streuen stark. Bei 70 \% liegt der Median bei 126 ms, das 90. Perzentil bei 1,1 s und die langsamste Zeit bei 14,9 s. Bei CDCL ist die langsamste Zeit mit 19,8 ms nur das 2,4-Fache des Medians. Auf \emph{eindeutig} gibt es keinen Abbruch. Auf \emph{zufall} gibt es bei der Hauptmessung genau einen, beim Backtracking bei 70 \%. Dort wird das Backtracking später langsam, bei 70 \% beträgt sein Median 18,8 ms, und CDCL ist nur 2,7-mal statt 13,5-mal schneller.
+
+\paragraph{Suchaufwand und Kosten der Formel.} Der Median der Schritte des Backtrackings steigt von 26 bei 24 leeren Feldern auf 99 bei 40 und auf 20\,830 bei etwa 56. Ob ein SAT-Solver suchen muss, hängt ebenfalls von der Stufe ab (Abbildung~\ref{abb:ohne}). Bis 50 \% löst die Propagation allein alle Rätsel, bei 55 \% sind es 89 \%, bei 60 \% 65 \%, bei 65 \% 15 \% und bei 70 \% kein Rätsel. Bei \emph{zufall} ist der Anteil kleiner, bei 50 \% nur 39 \%. Er entspricht fast dem Anteil der Rätsel mit genau einer Lösung (40 \%). Bei mehreren Lösungen bleibt mindestens ein Feld unbestimmt, das die Propagation nicht festlegen kann, also muss geraten werden. Die Schwierigkeit hängt nur teilweise vom Verfahren ab. Über alle Stufen korrelieren die Schritte des Backtrackings mit den Konflikten von CDCL mit $\rho = 0{,}70$, innerhalb einer Stufe ab 55 \% nur mit 0,05 bis 0,47. Beide Zähler wachsen also vor allem gemeinsam mit der Zahl leerer Felder. Die Formel hat bei jedem Rätsel 729 Variablen und 8829 Klauseln, dazu kommt eine Klausel je Vorgabe. Das Erzeugen dauert im Median 1,08 ms, das sind bei CDCL 13 bis 15 \% und bei DPLL 11,5 bis 12,3 \% der Gesamtzeit.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.8\textwidth]{\plotdir e2_ohne_suche_eindeutig}
+\caption{Anteil der Rätsel, die ohne Rückschritt (Backtracking) bzw. ohne Entscheidung (SAT) gelöst werden (\emph{eindeutig})}\label{abb:ohne}
+\end{figure}
+
+\paragraph{Bausteine der SAT-Solver.} Tabelle~\ref{tab:bausteine} zeigt den Einfluss einzelner Bausteine auf Zeit und Konflikte. Bei 50 \% braucht kein DPLL-Lauf eine Entscheidung, bei 60 \% ist der Median der Entscheidungen null. Die Medianzeiten unterscheiden sich trotzdem (DPLL: \emph{first} 6,9 ms, \emph{shortest\_any} 7,4 ms, \emph{shortest} 8,8 ms, \emph{jw} 8,9 ms). Der Unterschied kommt also nicht von der Suche, sondern von festen Kosten des jeweiligen Auswahlverfahrens. Bei 70 \% zählt die Qualität der Auswahl. Der Median der Konflikte liegt bei \emph{shortest} und \emph{shortest\_any} bei 13, bei \emph{jw} bei 18,5 und bei \emph{first} bei 42,5. Das Maximum sinkt von 958 (\emph{first}) auf 162 (\emph{shortest}).
+
+\begin{table}[htb]
+\centering\small
+\caption{Verhältnis zur Standardkonfiguration als geometrisches Mittel über 150 Paare (3 Stufen mit je 50 Rätseln) mit 95-\%-Intervall. Bei den Konflikten wurde 1 addiert, weil viele Läufe keinen Konflikt haben. Bei der erweiterten Kodierung ist die Referenz die minimale Kodierung. Alle drei Bausteine aus: ohne Phase-Saving, Neustarts und Klausellöschung.}\label{tab:bausteine}
+\begin{tabular}{@{}l l l@{}}
+\toprule
+Konfiguration & Zeit & Konflikte \\
+\midrule
+CDCL Heuristik shortest statt VSIDS & 1,20 (1,18 bis 1,21) & 0,85 (0,78 bis 0,94) \\
+CDCL ohne Phase-Saving & 0,99 (0,97 bis 1,00) & 0,93 (0,87 bis 0,99) \\
+CDCL ohne Neustarts & 1,00 (1,00 bis 1,00) & 1,00 (1,00 bis 1,00) \\
+CDCL ohne Klausellöschung & 1,00 (1,00 bis 1,00) & 1,00 (1,00 bis 1,00) \\
+CDCL Anfangsphase wahr & 1,00 (0,98 bis 1,02) & 1,02 (0,94 bis 1,12) \\
+CDCL alle drei Bausteine aus & 0,99 (0,97 bis 1,00) & 0,93 (0,87 bis 0,99) \\
+DPLL mit erweiterter Kodierung & 1,33 (1,30 bis 1,35) & 0,50 (0,41 bis 0,59) \\
+CDCL mit erweiterter Kodierung & 1,28 (1,25 bis 1,31) & 0,49 (0,42 bis 0,57) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Bei CDCL verändert nur die Entscheidungsheuristik die Zeit. Mit \emph{shortest} statt VSIDS sinken Konflikte (Faktor 0,85) und Entscheidungen (0,78), die Zeit steigt aber um den Faktor 1,20. Phase-Saving abzuschalten spart etwa 1 \% Zeit. Neustarts und Klausellöschung haben in dieser Messreihe keinen Effekt, denn sie werden nie ausgelöst. Neustarts beginnen nach 100 Konflikten, die erste Löschung nach 2000, der größte Wert in dieser Messreihe sind 87 Konflikte. Selbst bei den schweren Rätseln sind es höchstens 534 Konflikte und vier Neustarts, eine Löschung kommt nie vor. CDCL mit \emph{shortest} (8,85, 8,90 und 9,63 ms) und DPLL mit \emph{shortest} (8,80, 8,81 und 9,55 ms) sind bei 50, 60 und 70 \% praktisch gleich schnell. Die erweiterte Kodierung hat 36 \% mehr Klauseln und halbiert die Konflikte (Faktor 0,49 bei CDCL, 0,50 bei DPLL). Die Zeit steigt dennoch um 28 \% (CDCL) bzw. 33 \% (DPLL).
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.8\textwidth]{\plotdir e5_cdcl_ablation}
+\caption{Laufzeit der CDCL-Konfigurationen}\label{abb:e5}
+\end{figure}
+
+\paragraph{Unlösbare und schwere Rätsel.} Bei den unlösbaren Rätseln stellen beide SAT-Verfahren die Unlösbarkeit bei allen 51 Rätseln allein durch Propagation fest, ohne Entscheidung und mit genau einem Konflikt. Der Median liegt bei 6,73 ms (CDCL) und 8,08 ms (DPLL). Das Backtracking hat einen Median von 0,55 ms, ist aber bei dem handverlesenen unlösbaren Rätsel mit 72 leeren Feldern nach 20 s abgebrochen worden. Sein PAR-2-Wert liegt deshalb bei 785 ms. Tabelle~\ref{tab:e8} zeigt die schweren Rätsel. Backtracking wird bei zwei der sechs Rätsel abgebrochen. CDCL löst alle in höchstens 80 ms, DPLL in höchstens 318 ms. Die PAR-2-Werte betragen 13\,450 ms (Backtracking), 86,9 ms (DPLL) und 28,7 ms (CDCL). Kein Verfahren gewinnt überall. CDCL ist bei drei Rätseln am schnellsten, DPLL bei zwei, Backtracking bei einem. Wegen der sechs Rätsel gibt es hier keine Tests.
+
+\begin{table}[htb]
+\centering\small
+\caption{Laufzeit in ms bei handverlesenen schweren Rätseln, schnellster Wert fett. Abbruch nach 20\,000 ms.}\label{tab:e8}
+\begin{tabular}{@{}l r r r r@{}}
+\toprule
+Rätsel & leer & Backtracking & DPLL & CDCL \\
+\midrule
+Inkala 2012 & 60 & 502,1 & 95,1 & \textbf{79,7} \\
+AI Escargot & 58 & 91,0 & \textbf{9,4} & 22,2 \\
+Anti-Backtracking & 64 & $\geq$ 20\,000 & 318,4 & \textbf{15,2} \\
+Norvig hard1 & 64 & $\geq$ 20\,000 & \textbf{12,0} & 15,1 \\
+ungünstig für SAT (viele Konflikte) & 57 & 68,2 & 58,9 & \textbf{27,3} \\
+leicht für Backtracking, schwer für SAT & 57 & \textbf{9,9} & 27,8 & 12,9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Von 6621 Läufen wurden vier abgebrochen, jeweils beim Backtracking (einmal bei der Hauptmessung, einmal bei den unlösbaren und zweimal bei den schweren Rätseln). Alle beendeten Läufe waren korrekt, und es gab keinen Widerspruch zwischen den Verfahren.
 
 \subsection{Diskussion}\label{sec:diskussion}
+Kein Verfahren ist durchweg besser. Auf \emph{eindeutig} ist das Backtracking bis 55 \% leeren Feldern schneller, ab 65 \% CDCL, und dazwischen gibt es bei 60 \% keinen sicheren Unterschied. Der Grund liegt in der Form der Kosten. Die Formel ist für jedes 9x9-Rätsel gleich groß, und bei wenigen leeren Feldern löst die Propagation fast alles. Die Zeit der SAT-Verfahren besteht deshalb zum größten Teil aus festen Kosten von 7 bis 9 ms, von denen das Erzeugen der Formel nur etwa 1 ms ausmacht. Das Backtracking hat fast keine festen Kosten, dafür wächst sein Aufwand mit der Suche stark. Die Kurven müssen sich dort kreuzen, wo die Suche des Backtrackings so teuer wird wie diese festen Kosten. Das passt dazu, dass der Median des Backtrackings bei 60 \% mit 4,65 ms noch knapp unter und bei 65 \% mit 31,5 ms klar über diesen Kosten liegt. Die Lage des Kreuzungspunkts hängt von den Umsetzungen ab, die Form der Kurven nicht.
+
+Wichtiger als der Median ist die Verlässlichkeit. Bei 60 \% hat das Backtracking den besseren Median, aber einen schlechteren Mittelwert, weil wenige sehr lange Läufe den Mittelwert bestimmen. Bei 70 \% ist sein langsamster Lauf rund 120-mal so lang wie sein Median, bei CDCL nur 2,4-mal. Bei unlösbaren und schweren Rätseln ist es ebenso. Die SAT-Verfahren brauchen für alle unlösbaren Rätsel etwa gleich lang, das Backtracking wurde beim schwersten Fall abgebrochen. Wer eine Obergrenze für die Wartezeit braucht, ist mit SAT besser beraten.
+
+Der erwartete Vorteil von CDCL gegenüber DPLL ist in diesen Daten klein und hat eine andere Ursache als das Lernen. DPLL ist je Stufe 15 bis 23 \% langsamer. Dieselbe Lücke entsteht, wenn man bei CDCL die Heuristik durch die von DPLL ersetzt (Faktor 1,20). CDCL mit \emph{shortest} und DPLL sind praktisch gleich schnell. Das Lernen senkt zwar die Konflikte, bei 70 \% im Median von 13 auf 6,5, spart aber keine messbare Zeit. Neustarts und Löschung werden kaum ausgelöst, weil sie erst nach 100 bzw. 2000 Konflikten beginnen und die Rätsel meist weniger erzeugen. Man kann daraus nur schließen, dass diese Bausteine bei 9x9-Sudokus hier nicht gebraucht werden. Über größere Gitter sagen die Daten nichts.
+
+Bei der erweiterten Kodierung bedeutet weniger Suche nicht automatisch weniger Zeit. Sie halbiert die Konflikte, kostet aber 36 \% mehr Klauseln und damit 28 bis 33 \% mehr Zeit. Konflikte sind bei Sudoku so selten und billig, dass zusätzliche Klauseln mehr kosten, als sie sparen. Dasselbe gilt für die Heuristik \emph{shortest} bei CDCL.
+
+Rätsel mit mehreren Lösungen verhalten sich anders als eindeutige. Sie erzwingen im SAT-Solver mindestens eine Entscheidung, sind für das Backtracking aber leichter. Warum, wurde nicht untersucht. Wegen dieses Unterschieds ist die Familie \emph{eindeutig} der ehrlichere Vergleich. Weil außerdem die Schwierigkeit innerhalb einer Stufe zwischen den Verfahren nur schwach zusammenhängt, sagt der Anteil leerer Felder den Aufwand im Mittel voraus, aber nicht für das einzelne Rätsel. Die handverlesenen Rätsel zeigen das, denn zwei sind für Backtracking sehr schwer und für SAT leicht, bei einem ist es umgekehrt.
+
+Rahmen und Einschränkungen: Alle Verfahren sind in Python geschrieben, absolute Zeiten und Quotienten gelten nur für diese Umsetzungen und diesen Rechner. Alle Rätsel stammen aus demselben Generator, die Aussagen des Wilcoxon-Vorzeichen-Rang-Tests mit Bonferroni-Korrektur und der Bootstrap-Intervalle beziehen sich auf diese Rätselmengen. Es wurden nur 9x9-Sudokus gelöst, Speicherbedarf und andere Gittergrößen wurden nicht untersucht.
