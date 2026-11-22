@@ -247,16 +247,19 @@
 	\pagenumbering{arabic}
 	\input{config/gliederung}
 
+	% Anhang derzeit ohne Inhalt und daher deaktiviert.
+	% Zum Aktivieren die folgenden Zeilen einkommentieren und appendix/index.tex befüllen.
+
 	% Anhang-Nummerierung
-	\renewcommand{\thetable}{\Alph{section}.\arabic{table}}
-	\renewcommand{\thefigure}{\Alph{section}.\arabic{figure}}
-	\renewcommand{\thelstlisting}{\Alph{section}.\arabic{lstlisting}}
+	% \renewcommand{\thetable}{\Alph{section}.\arabic{table}}
+	% \renewcommand{\thefigure}{\Alph{section}.\arabic{figure}}
+	% \renewcommand{\thelstlisting}{\Alph{section}.\arabic{lstlisting}}
 
 	% Abschluss: Reihenfolge gem. Richtlinie V 2.0 (Anhang VOR Literatur)
 
-    \begin{appendix}
-		\include{appendix/index}
-	\end{appendix}
+    % \begin{appendix}
+	% 	\include{appendix/index}
+	% \end{appendix}
     
 	\include{pages/18_literaturverzeichnis}
 
