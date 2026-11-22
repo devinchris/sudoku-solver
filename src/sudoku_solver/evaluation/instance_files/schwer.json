@@ -1,0 +1,80 @@
+{
+ "meta": {
+  "beschreibung": "handverlesene schwere Rätsel",
+  "anzahl": 6,
+  "hash": "5217c4f707918a3bee37124f60ed2422f436ee78c4bdd412164d2fa7d8baddf8",
+  "py_sudoku": "2.0.0",
+  "config": {
+   "EVAL_SEED_BASE": 1000000,
+   "SEED_STRIDE": 10000,
+   "REPLICATION_OFFSET": 5000000,
+   "FAMILY_OFFSET": {
+    "zufall": 0,
+    "eindeutig": 2000000,
+    "unloesbar": 3000000
+   }
+  }
+ },
+ "instanzen": [
+  {
+   "id": "schwer_1",
+   "familie": "schwer",
+   "level": null,
+   "seed": null,
+   "text": "800000000003600000070090200050007000000045700000100030001000068008500010090000400",
+   "n_leer": 60,
+   "loesungen": 1,
+   "name": "Inkala 2012 („schwerstes Sudoku der Welt“)"
+  },
+  {
+   "id": "schwer_2",
+   "familie": "schwer",
+   "level": null,
+   "seed": null,
+   "text": "100007090030020008009600500005300900010080002600004000300000010040000007007000300",
+   "n_leer": 58,
+   "loesungen": 1,
+   "name": "AI Escargot"
+  },
+  {
+   "id": "schwer_3",
+   "familie": "schwer",
+   "level": null,
+   "seed": null,
+   "text": "000000000000003085001020000000507000004000100090000000500000073002010000000040009",
+   "n_leer": 64,
+   "loesungen": 1,
+   "name": "Anti-Backtracking"
+  },
+  {
+   "id": "schwer_4",
+   "familie": "schwer",
+   "level": null,
+   "seed": null,
+   "text": "400000805030000000000700000020000060000080400000010000000603070500200000104000000",
+   "n_leer": 64,
+   "loesungen": 1,
+   "name": "Norvig „hard1“"
+  },
+  {
+   "id": "schwer_5",
+   "familie": "schwer",
+   "level": null,
+   "seed": null,
+   "text": "004600000008300025090020007000036008400000030000800904900003100050080000007900000",
+   "n_leer": 57,
+   "loesungen": 1,
+   "name": "Ungünstig für SAT (viele Konflikte)"
+  },
+  {
+   "id": "schwer_6",
+   "familie": "schwer",
+   "level": null,
+   "seed": null,
+   "text": "030000060000400710070050080400100090600705000002000008000010009005002600069000040",
+   "n_leer": 57,
+   "loesungen": 1,
+   "name": "Leicht für Backtracking, schwer für SAT"
+  }
+ ]
+}
