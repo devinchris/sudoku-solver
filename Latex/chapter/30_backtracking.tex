@@ -45,7 +45,7 @@ Wie in Abschnitt~\ref{sec:komplexitaet} beschrieben,
 ließe sich die Lösbarkeit auch durch Prüfen aller $9^k$ vollständigen Belegungen entscheiden. 
 Bei $k = 60$ leeren Zellen wären das jedoch etwa $1{,}8 \cdot 10^{57}$ Belegungen, 
 für die selbst eine Milliarde Prüfungen pro Sekunde mehr als $10^{40}$ Jahre bräuchten. 
-Backtracking vermeidet diesen Aufwand, indem es die Konsistenz bereits nach jeder gesetzten Ziffer prüft \vgl{russell2021}. 
+Backtracking vermeidet diesen Aufwand, indem es die Konsistenz bereits nach jeder gesetzten Ziffer prüft \vgl[S. 214ff.]{russell2021}. 
 Grundlage ist eine Monotonie-Eigenschaft: Enthält ein Zustand einen Widerspruch, so enthält ihn auch jede seiner Erweiterungen. 
 Ein inkonsistenter Zustand wird daher gar nicht erst erzeugt, 
 und mit ihm entfällt sein gesamter Teilbaum mit bis zu $9^{k-i}$ Belegungen. 
@@ -225,7 +225,7 @@ die \texttt{is\_solved} in polynomieller Zeit leistet.
 Diese Asymmetrie entspricht der Einordnung in NP aus Abschnitt~\ref{sec:komplexitaet}: 
 Das Backtracking ersetzt das nichtdeterministische Raten einer Lösung durch systematisches Ausprobieren 
 und bezahlt dies mit exponentiellem Aufwand. 
-Da das verallgemeinerte Sudoku NP-vollständig ist \vgl{yato2003}, 
+Da das verallgemeinerte Sudoku NP-vollständig ist \vgl[S. 25]{yato2003}, 
 existiert unter der Annahme $\mathrm{P} \neq \mathrm{NP}$ kein Algorithmus mit polynomieller Laufzeit. 
 Der exponentielle Worst Case ist somit eine Eigenschaft des Problems und nicht des Verfahrens. 
 Verbessern lässt sich jedoch der Aufwand typischer Instanzen durch eine geschicktere Suchreihenfolge, 
@@ -238,12 +238,12 @@ Am exponentiellen Worst Case lässt sich nach Abschnitt~\ref{sec:bt-komplexitaet
 Der Aufwand für eine konkrete Instanz hängt jedoch stark davon ab, in welcher Reihenfolge die Zellen belegt werden. 
 Das naive Backtracking belegt sie in einer festen, zeilenweisen Reihenfolge, unabhängig vom aktuellen Zustand. 
 Im Modul \texttt{heuristic.py} sind zwei Heuristiken aus dem Bereich der Constraint-Satisfaction-Probleme umgesetzt, 
-die die Suche an den aktuellen Zustand anpassen \vgl{russell2021}. 
+die die Suche an den aktuellen Zustand anpassen \vgl[S. 202]{russell2021}. 
 Beide lassen sich unabhängig voneinander zuschalten.
 
 \emph{\ac{MRV}:} Statt der nächsten Zelle in fester Reihenfolge wird die leere Zelle 
 mit den wenigsten zulässigen Ziffern, den sogenannten Kandidaten, als Nächstes belegt. 
-Dahinter steht das Fail-First-Prinzip \vgl{haralick1980}: 
+Dahinter steht das Fail-First-Prinzip \vgl[S. 302f.]{haralick1980}: 
 Muss ein Zweig scheitern, soll er möglichst früh und damit möglichst nah an der Wurzel scheitern, 
 da so der größte Teilbaum eingespart wird. 
 Hat eine Zelle nur einen Kandidaten, ist ihre Belegung erzwungen und der Baum verzweigt sich an dieser Stelle nicht. 
