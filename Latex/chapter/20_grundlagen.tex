@@ -32,3 +32,28 @@ Da Sudoku in NP liegt und SAT NP-vollständig ist, existiert eine polynomielle R
 
 
 \subsection{Der DPLL-Algorithmus}\label{sec:dpll}
+
+\subsection{Leistungsbewertung von Lösungsverfahren}\label{sec:leistungsbewertung}
+\subsubsection{Zeit- und Aufwandsmaße}\label{sec:zeitmasse}
+Die Python-Standardbibliothek stellt unter anderem zwei Uhren bereit. Der \texttt{perf\_counter} ist die Uhr mit der höchsten verfügbaren Auflösung für kurze Zeitspannen und zählt auch die Zeit, in der ein Programm schläft. Die \texttt{process\_time} liefert die Summe aus System- und Benutzer-CPU-Zeit des aktuellen Prozesses und zählt Schlafzeit nicht mit. \vgl{pythontime} Die Wanduhrzeit allein reicht nicht immer aus, weil sie mehrfädige Programme nicht sinnvoll vergleicht und von Ein- und Ausgabe beeinflusst wird. Die CPU-Zeit ist aussagekräftiger, aber schwieriger zu messen \vgl[S.~2]{beyer2019}.
+
+Eine einzelne Messung berücksichtigt den Nichtdeterminismus nicht. Für Java-Programme wurde gezeigt, dass die Angabe der besten Messung irreführt, und es werden Konfidenzintervalle gefordert, an denen sich erkennen lässt, ob Unterschiede auf Zufall oder auf echten Unterschieden beruhen. Nur 4 von 50 untersuchten Arbeiten gaben solche Intervalle an. \vgl{georges2007} Das Modul \texttt{timeit} schaltet die Garbage Collection beim Messen standardmäßig ab, weil dadurch unabhängige Messungen besser vergleichbar werden \vgl{pythontimeit}.
+
+Bei schweren Problemen lässt sich ein Zeitlimit oft nicht vermeiden, wodurch jede Bewertung vom Limit und vom Ausführungskontext abhängt \vgl[S.~706]{amadini2023}. Bei einem abgebrochenen Lauf ist nur bekannt, dass seine Laufzeit mindestens das Limit beträgt, die Laufzeiten sind rechtszensiert \vgl[S.~43:11]{matricon2021}. Die Penalised Average Running time (PAR) berücksichtigt das. Gelöste Instanzen zählen mit ihrer Laufzeit, nicht gelöste mit dem $\lambda$-fachen des Zeitlimits, über alle Instanzen wird der Mittelwert gebildet. In SAT-Wettbewerben wird PAR2 verwendet. \vgl[S.~707]{amadini2023}
+
+Verhältnisse von Laufzeiten dürfen nicht beliebig gemittelt werden. Der arithmetische Mittelwert normierter Zahlen liefert Ergebnisse, die davon abhängen, auf welches System normiert wurde. Das geometrische Mittel kann dagegen unabhängig von der Normierung verwendet werden. \vgl[S.~218 f.]{fleming1986}
+
+\subsubsection{Statistische Auswertung}\label{sec:statistik}
+Mittelwerte sind anfällig für Ausreißer, weil eine sehr gute Leistung bei einer Instanz ein Versagen bei einer anderen ausgleichen kann \vgl[S.~6]{demsar2006}. Laufzeitverteilungen sind zudem oft schwerschwänzig \vgl[S.~43:11]{matricon2021}. Einzelne sehr lange Läufe können einen Mittelwert daher stark bestimmen, weshalb auch der Median und Perzentile berichtet werden.
+
+Für Kennzahlen wie den Median gibt es keine einfache Formel für die Genauigkeit der Schätzung, wie sie für den Mittelwert existiert \vgl[S.~12]{efron1993}. Dafür eignet sich der Bootstrap. Eine Bootstrap-Stichprobe entsteht, indem aus den $n$ Werten $n$-mal mit Zurücklegen gezogen wird, und auf ihr wird die Kennzahl neu berechnet \vgl[S.~12 f.]{efron1993}. Weil sich die Bootstrap-Verteilung schwer exakt berechnen lässt, wird sie durch wiederholtes Ziehen angenähert \vgl[S.~4]{efron1979}. Beim Perzentil-Verfahren dienen deren Perzentile als Intervallgrenzen \vgl[S.~7]{efron1993}. Ein Beispiel ist ein grobes 95-\%-Intervall aus der 25.\ und 975.\ größten von 1000 Replikationen \vgl[S.~5]{efron1993}. Das Jackknife ist für den Median keine Alternative, denn sein Varianzschätzer ist nicht einmal asymptotisch konsistent \vgl[S.~6]{efron1979}.
+
+Zwei Verfahren auf denselben Instanzen liefern gepaarte Daten. Dafür bietet es sich an, statt der Messwerte die Rangzahlen der Differenzen zu verwenden \vgl[S.~80 f.]{wilcoxon1945}. Beim Wilcoxon-Vorzeichen-Rang-Test werden die Differenzen nach ihrem Betrag in Ränge gebracht, und die Ränge der positiven und negativen Differenzen werden getrennt summiert. Die kleinere Summe $T$ ist die Prüfgröße. Tabellen mit exakten kritischen Werten gibt es für $N$ bis 25. Bei größerem $N$ ist
+\begin{equation}
+z = \frac{T - \frac{1}{4}N(N+1)}{\sqrt{\frac{1}{24}N(N+1)(2N+1)}}
+\end{equation}
+annähernd normalverteilt \vgl[S.~7]{demsar2006}. Der Test setzt keine Normalverteilung voraus, Ausreißer wirken schwächer als beim t-Test, und größere Differenzen zählen dennoch mehr \vgl[S.~8]{demsar2006}. Für gepaarte Laufzeiten wird er deshalb verwendet, und es werden mindestens 20 Stichproben empfohlen. \vgl[S.~43:8 und 43:10]{matricon2021}
+
+Werden mehrere Tests gleichzeitig durchgeführt, soll das Gesamtniveau erhalten bleiben. Dafür dient die Bonferroni-Ungleichung, die eine untere Schranke für die gemeinsame Wahrscheinlichkeit liefert, ohne dass die gemeinsame Verteilung bekannt sein muss \vgl[S.~52 f.]{dunn1961}. Bei der Bonferroni-Korrektur wird $\alpha$ durch die Anzahl der Vergleiche geteilt. Sie ist konservativ und kann wenig Teststärke haben. \vgl[S.~12]{demsar2006}
+
+Für den Zusammenhang zweier Größen wird die Korrelation auf Rängen statt auf Messwerten berechnet \vgl[S.~80]{spearman1904}. Das verringert den Einfluss von Ausreißern, enthält theoretisch aber etwas weniger Information. \vgl[S.~81]{spearman1904}

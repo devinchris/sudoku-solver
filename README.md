@@ -11,6 +11,7 @@ cd sudoku-solver
 python3 -m venv .venv
 source .venv/bin/activate        # for Windows: .venv\Scripts\activate
 pip install -e .
+pip install -r evaluation/requirements.txt   # only needed for the evaluation
 ```
 
 ## Starting the web interface
@@ -44,4 +45,24 @@ All code lives in src/sudoku_solver/:
 - solvers: backtracking solver and helper functions
   - backtracking: naive solver, heuristics (MRV, forward checking), counting solutions and Knuth's estimator for the size of the search tree. Comparison tables: `python -m sudoku_solver.solvers.backtracking.report`
 - ui: web app in streamlit
+
+Outside of src/:
+
+- evaluation: measurements and statistics comparing backtracking, DPLL and CDCL (runtime, search effort, abort rate), plots in `evaluation/plots`, tables in `evaluation/results/tabellen`
+- tests_eval: tests for the evaluation code
+- Latex: written report (main file `Latex/vorlage.tex`)
+
+## Running the evaluation
+
+Only classic 9x9 Sudokus are measured. All settings (puzzle sets, time limit of 20 s, repetitions) are defined in `evaluation/config.py`.
+
+```bash
+python -m pytest tests_eval -q          # tests for the evaluation code
+python -m evaluation all --quick        # quick check, about 10 minutes, not for the report
+python -m evaluation all                # full measurement, about 1 to 2 hours
+python -m evaluation analyze            # recompute the tables only
+python -m evaluation plots              # redraw the plots only
+```
+
+Close other programs and keep the computer plugged in while measuring, because the runs are timed. Each metric and every column of the result tables is explained in `evaluation/METRIKEN.md`.
 
