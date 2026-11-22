@@ -1,0 +1,14 @@
+\section*{\langListingsverzeichnis}
+
+\markboth{\langListingsverzeichnis}{\langListingsverzeichnis}
+
+\addcontentsline{toc}{section}{\langListingsverzeichnis}
+
+% Ein gemeinsames Verzeichnis für Quellcode (lstlisting, Datei .lol)
+% und Pseudocode (algorithm, Datei .loa)
+\makeatletter
+\@starttoc{lol}
+\@starttoc{loa}
+\makeatother
+
+\newpage
