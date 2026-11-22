@@ -74,6 +74,7 @@
 \usepackage[noend]{algpseudocode}  % Pseudocode-Befehle (\Function, \If, \For, ...)
 \floatname{algorithm}{Algorithmus}
 \numberwithin{algorithm}{section}
+\AtBeginDocument{\counterwithin{lstlisting}{section}} % Zähler wird von listings erst bei \begin{document} angelegt
 
 \pdfminorversion=6
 

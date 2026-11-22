@@ -2,7 +2,7 @@
 
 Dieses Kapitel beschreibt einen Sudoku-Solver, der das Rätsel als aussagenlogische Formel formuliert und mit einem \acs{SAT}-Solver löst.
 Das Lösen durchläuft drei Schritte: Das Gitter wird in Klauseln kodiert, ein \acs{SAT}-Solver sucht ein Modell, und dieses Modell wird zurück in ein ausgefülltes Gitter übersetzt.
-Abschnitt~\ref{sec:sat-encoding} führt \acs{SAT} ein und beschreibt die Kodierung, Abschnitt~\ref{sec:algorithms} die Suchalgorithmen DPLL und \acs{CDCL} und Abschnitt~\ref{sec:implementation} deren Implementierung.
+Abschnitt~\ref{sec:sat-encoding} führt \acs{SAT} ein und beschreibt die Kodierung, Abschnitt~\ref{sec:algorithms} die Suchalgorithmen \acl{DPLL} (\acs{DPLL})\acused{DPLL} und \acl{CDCL} (\acs{CDCL})\acused{CDCL} und Abschnitt~\ref{sec:implementation} deren Implementierung.
 
 \subsection{SAT und die Sudoku-Kodierung} \label{sec:sat-encoding}
 
@@ -20,7 +20,7 @@ Eine \acs{KNF}-Formel ist eine Konjunktion von Klauseln \vgl[204]{davis1960}, zu
 \]
 Eine Belegung mit Wahrheitswerten, die jede Klausel erfüllt, ist ein \emph{Modell} von $F$.
 Hier ist $x_1 = x_2 = \text{wahr}$ und $x_3 = \text{falsch}$ ein solches.
-Das \emph{\acl{SAT}} (\acs{SAT})\acused{SAT} fragt, ob eine Formel ein Modell hat.
+\acs{SAT} ist die Frage, ob eine Formel ein Modell hat.
 
 \acs{SAT} war das erste Problem, dessen NP-Vollständigkeit bewiesen wurde \vgl[151\psq]{cook1971}. Daher ist kein Algorithmus bekannt, der jede Instanz in Polynomialzeit löst.
 Die beiden möglichen Antworten unterscheiden sich darin, wie schwer sie zu überprüfen sind.
@@ -126,7 +126,7 @@ Das Verzweigen entspricht dem Raten.
 
 Gerät DPLL in einen Konflikt, macht es nur die letzte Entscheidung rückgängig und vergisst, warum der Konflikt entstanden ist.
 Dieselbe Kombination von Belegungen kann daher in anderen Teilen der Suche immer wieder denselben Konflikt verursachen.
-\emph{Conflict-driven clause learning} (\acs{CDCL})\acused{CDCL} analysiert stattdessen jeden Konflikt.
+\acs{CDCL} analysiert stattdessen jeden Konflikt.
 Es fügt die Ursache als neue Klausel zur Formel hinzu und springt direkt dorthin zurück, wo diese Ursache begann \vgl[509\psqq]{marquessilva1999}.
 Zusammen mit den Techniken des Chaff-Solvers \vgl[530\psqq]{moskewicz2001} bildet dies die Grundlage praktisch aller modernen \acs{SAT}-Solver.
 
@@ -150,7 +150,7 @@ Ebenen, deren Entscheidungen für den Konflikt keine Rolle spielten, werden voll
 Da jede gelernte Klausel eine Belegung ausschließt, die bereits zu einem Konflikt geführt hat, terminiert die Suche weiterhin.
 
 Vier weitere Techniken entscheiden darüber, wie gut dies in der Praxis funktioniert.
-Die \acs{VSIDS}-Heuristik wählt die Entscheidungsvariablen: Variablen, die an jüngsten Konflikten beteiligt waren, erhalten einen höheren Score, und alle Scores klingen mit der Zeit ab, sodass der Solver dort verzweigt, wo die letzten Konflikte auftraten \vgl[531\psq]{moskewicz2001}.
+Die Heuristik \emph{\acl{VSIDS}} (\acs{VSIDS})\acused{VSIDS} wählt die Entscheidungsvariablen: Variablen, die an jüngsten Konflikten beteiligt waren, erhalten einen höheren Score, und alle Scores klingen mit der Zeit ab, sodass der Solver dort verzweigt, wo die letzten Konflikte auftraten \vgl[531\psq]{moskewicz2001}.
 \emph{Restarts} setzen die Suche in Abständen, die durch die Luby-Folge vorgegeben sind, auf Ebene 0 zurück, behalten aber die gelernten Klauseln und die Scores bei, damit eine ungünstige frühe Entscheidung den Solver nicht festhält \parencites[vgl.][532]{moskewicz2001}[178]{luby1993}.
 Beim \emph{Phase Saving} erhält eine Entscheidungsvariable den Wert, den sie zuletzt hatte, statt eines festen Werts; dies führt die Suche nach einem Restart zu vielversprechenden Belegungen zurück \vgl[297]{pipatsrisawat2007}.
 Schließlich kosten gelernte Klauseln Speicher und verlangsamen die Propagation, weshalb der Solver regelmäßig die weniger nützliche Hälfte von ihnen löscht.
