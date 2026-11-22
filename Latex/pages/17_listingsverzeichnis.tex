@@ -4,11 +4,11 @@
 
 \addcontentsline{toc}{section}{\langListingsverzeichnis}
 
-% Ein gemeinsames Verzeichnis für Quellcode (lstlisting, Datei .lol)
-% und Pseudocode (algorithm, Datei .loa)
+% Ein gemeinsames Verzeichnis für Quellcode (lstlisting) und Pseudocode (algorithm).
+% Beide schreiben in die Datei .lol (siehe \ext@algorithm in vorlage.tex),
+% damit die Einträge in Dokumentreihenfolge erscheinen.
 \makeatletter
 \@starttoc{lol}
-\@starttoc{loa}
 \makeatother
 
 \newpage

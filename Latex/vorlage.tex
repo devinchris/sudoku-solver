@@ -75,6 +75,10 @@
 \floatname{algorithm}{Algorithmus}
 \numberwithin{algorithm}{section}
 \AtBeginDocument{\counterwithin{lstlisting}{section}} % Zähler wird von listings erst bei \begin{document} angelegt
+\makeatletter
+\def\ext@algorithm{lol}                            % Algorithmen ins gemeinsame Listingverzeichnis schreiben (Dokumentreihenfolge)
+\def\l@algorithm{\@dottedtocline{1}{1.5em}{2.3em}} % gleiche Formatierung wie Listing-Einträge
+\makeatother
 
 \pdfminorversion=6
 
